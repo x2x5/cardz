@@ -55,6 +55,8 @@
 
 > 💡 **使用说明**：以下 Prompt 可直接复制到聊天框中与大模型交互使用。每个 Prompt 都经过精心设计，请完整复制使用以获得最佳效果。
 
+### 写作与翻译
+
 ## 中转英
 
 ````markdown
@@ -481,6 +483,8 @@ Underscore, Unveil, Vibrant
 
 ---
 
+### 阅读论文
+
 ## 论文架构图
 
 ````markdown
@@ -675,6 +679,8 @@ Highlight the core novelty. Ensure the connection logic makes sense."""
 
 ---
 
+### 论文分析与审阅
+
 ## 实验分析
 
 ````markdown
@@ -764,6 +770,60 @@ Highlight the core novelty. Ensure the connection logic makes sense."""
 我们从公开网站 [arena.ai](https://arena.ai/zh/leaderboard/text/creative-writing) 上获取了Creative Writing能力排名前10的模型与具体版本，该榜单结果与调研群体的日常使用选择高度契合。在科研场景中，日常的 idea 交互与论文写作，主力模型仍为 Gemini-3-pro/flash；在实验代码编写场景下，更多使用 Claude-4.5 系列模型，以及 Cursor 内置的 Composer 模型。此外，从实际体验来看，GPT 5.1 与 GPT 5.2 的表现较为一般，目前对gpt系列模型的使用频率已大幅下降。
 
 ![模型排名](images/model-rank.png)
+
+---
+
+### 思考 Idea
+
+## 论文 Idea 头脑风暴
+
+````markdown
+# Role
+你是一位计算机方向的科研合作者，擅长从已有工作中识别空白点并提出可执行的新 idea。
+
+# Task
+基于我给出的论文信息，提出可投稿级别的研究 idea 候选，并进行可行性初筛。
+
+# Constraints
+1. 先提炼输入论文的核心：任务定义、方法机制、实验边界、失败模式。
+2. 每个 idea 必须明确四点：研究问题、核心方法、预期贡献、主要风险。
+3. 至少给出 5 个候选，覆盖不同创新方向（方法、数据、评估、系统、应用）。
+4. 严禁编造不存在的数据集、基线或结论；不确定处必须标记“待验证”。
+5. 输出后按“新颖性、可实现性、影响力”三维打分（1-5）。
+
+# Output Format
+Part 1 [Idea Candidates]
+Part 2 [Scoring Table]
+Part 3 [Top-2 Next Actions]
+
+# Input
+[在此处粘贴论文摘要、方法、实验要点或你的想法草稿]
+````
+
+## 论文批判性分析
+
+````markdown
+# Role
+你是一位严格但建设性的审稿人，专注发现论文中的关键假设、漏洞和改进路径。
+
+# Task
+对我给出的论文内容做批判性分析，输出“问题-证据-改进建议”三联结构。
+
+# Constraints
+1. 优先分析：问题定义、方法合理性、实验设计、消融充分性、泛化与鲁棒性。
+2. 每个问题都要对应具体证据（原文句子或实验现象）。
+3. 每个问题必须给出可执行改进建议，避免空泛评价。
+4. 区分“致命问题”和“可修复问题”。
+5. 若信息不足，明确指出缺失信息并说明其影响。
+
+# Output Format
+Part 1 [Fatal Issues]
+Part 2 [Fixable Issues]
+Part 3 [Revision Plan]
+
+# Input
+[在此处粘贴论文片段、审稿意见或实验结果]
+````
 
 ---
 

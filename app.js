@@ -196,6 +196,7 @@ function parsePromptItems(markdown) {
       return {
         id: section.id,
         title: section.title,
+        category: section.category || "未分类",
         prompt,
       };
     })
@@ -233,6 +234,7 @@ function splitSections(partOneText) {
   const lines = partOneText.split(/\r?\n/);
   const sections = [];
   let current = null;
+  let currentCategory = "未分类";
   let inFence = false;
   let fenceMarker = "";
   const usedIds = new Set();
@@ -255,6 +257,12 @@ function splitSections(partOneText) {
     }
 
     if (!inFence) {
+      const categoryHeading = line.match(/^###\s+(.+?)\s*$/);
+      if (categoryHeading) {
+        currentCategory = cleanTitle(categoryHeading[1]) || "未分类";
+        continue;
+      }
+
       const heading = line.match(/^##\s+(.+?)\s*$/);
       if (heading) {
         if (current) {
@@ -264,6 +272,7 @@ function splitSections(partOneText) {
         current = {
           id: buildStableId(title, usedIds),
           title,
+          category: currentCategory,
           content: [],
         };
         continue;
@@ -429,8 +438,8 @@ function createCard(item, zone, index) {
   const cancelEditBtn = node.querySelector(".cancel-edit-btn");
 
   title.textContent = item.title;
-  subtitle.textContent = "";
-  subtitle.classList.add("hidden");
+  subtitle.textContent = item.category || "未分类";
+  subtitle.classList.remove("hidden");
   preview.textContent = item.prompt;
   if (previewSummary) {
     const usage = document.createElement("span");
@@ -755,6 +764,7 @@ function addNewCard(title, prompt) {
   state.customCards.push({
     id,
     title,
+    category: "未分类",
     prompt,
   });
   state.commonIds.push(id);
@@ -792,6 +802,7 @@ function deleteCard(cardId) {
       state.trashedCustomCards.push({
         id: item.id,
         title: item.title,
+        category: item.category || "未分类",
         prompt: item.prompt,
       });
     }
@@ -820,6 +831,7 @@ function restoreFromTrash(cardId) {
     state.customCards.push({
       id: item.id,
       title: item.title,
+      category: item.category || "未分类",
       prompt: item.prompt,
     });
   }
@@ -921,6 +933,7 @@ function materializeItems(base, currentState) {
     const next = {
       id: item.id,
       title: patch && typeof patch.title === "string" ? patch.title : item.title,
+      category: item.category || "未分类",
       prompt: patch && typeof patch.prompt === "string" ? patch.prompt : item.prompt,
       source: "base",
     };
@@ -942,6 +955,7 @@ function materializeItems(base, currentState) {
     output.push({
       id: item.id,
       title: item.title,
+      category: item.category || "未分类",
       prompt: item.prompt,
       source: "custom",
     });
@@ -1010,6 +1024,7 @@ function normalizeState(raw) {
       .map((card) => ({
         id: String(card.id || "").trim(),
         title: String(card.title || "").trim(),
+        category: String(card.category || "").trim() || "未分类",
         prompt: String(card.prompt || "").trim(),
       }))
       .filter((card) => card.id && card.title && card.prompt);
@@ -1020,6 +1035,7 @@ function normalizeState(raw) {
       .map((card) => ({
         id: String(card.id || "").trim(),
         title: String(card.title || "").trim(),
+        category: String(card.category || "").trim() || "未分类",
         prompt: String(card.prompt || "").trim(),
       }))
       .filter((card) => card.id && card.title && card.prompt);
