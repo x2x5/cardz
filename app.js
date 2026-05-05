@@ -3,14 +3,9 @@
 const STORAGE_KEY = "prompt-card-layout-v2";
 const PRIMARY_DATA_SOURCE = "./skills.md";
 const FALLBACK_DATA_SOURCE = "./README.md";
-const PART_ONE_HEADING = /^#\s+Part I:\s*写作 Prompt 集合\s*$/;
+const PART_ONE_HEADING = /^#\s+Part I:\s*.*$/;
 const PART_TWO_HEADING = /^#\s+Part II:/;
-const DEFAULT_COMMON_TITLES = [
-  "中转英",
-  "英转中",
-  "表达润色（英文论文）",
-  "实验分析",
-];
+const DEFAULT_COMMON_TITLES = [];
 const META_TEMPLATE_TEXT = `# Role
 你是一位世界顶级的 AI 提示词工程师（Prompt Engineer）。你的任务是根据我的【核心需求】，为我量身定制一套高标准、结构化的提示词模板，以便我能够用它来指导其他 AI 完美执行任务。
 
@@ -40,7 +35,7 @@ const META_INPUT_PLACEHOLDER =
   "[在这里填写你的具体需求，例如：我想把一篇论文的 Introduction 喂给 AI，让它帮我写出一篇不超过300字的 Abstract，要有逻辑感，符合计算机顶会的风格。]";
 
 const commonRoot = document.getElementById("commonRoot");
-const poolRoot = document.getElementById("poolRoot");
+const stagesRoot = document.getElementById("stagesRoot");
 const trashRoot = document.getElementById("trashRoot");
 const clearTrashBtn = document.getElementById("clearTrashBtn");
 const cardCount = document.getElementById("cardCount");
@@ -224,7 +219,7 @@ function extractPartOne(markdown) {
   }
 
   if (!inPartOne) {
-    throw new Error("skills.md 中未找到 Part I");
+    return markdown;
   }
 
   return buffer.join("\n");
@@ -257,13 +252,13 @@ function splitSections(partOneText) {
     }
 
     if (!inFence) {
-      const categoryHeading = line.match(/^###\s+(.+?)\s*$/);
+      const categoryHeading = line.match(/^##\s+(.+?)\s*$/);
       if (categoryHeading) {
         currentCategory = cleanTitle(categoryHeading[1]) || "未分类";
         continue;
       }
 
-      const heading = line.match(/^##\s+(.+?)\s*$/);
+      const heading = line.match(/^###\s+(.+?)\s*$/);
       if (heading) {
         if (current) {
           sections.push(current);
@@ -354,6 +349,16 @@ function buildStableId(title, usedIds) {
   return id;
 }
 
+const STAGE_ORDER = [
+  "阶段 1：选题与调研",
+  "阶段 2：Idea 构思",
+  "阶段 3：方法设计",
+  "阶段 4：实验执行",
+  "阶段 5：论文写作",
+  "阶段 6：审稿与修改",
+  "阶段 7：投稿与准备",
+];
+
 function render(options = {}) {
   const suppressAnimation = Boolean(options.suppressAnimation);
   if (suppressAnimation) {
@@ -366,17 +371,70 @@ function render(options = {}) {
   const trashItems = (state.trashedCustomCards || []).map((item) => ({ ...item, source: "trash" }));
 
   renderList(commonRoot, commonItems, "common");
-  renderList(poolRoot, poolItems, "pool");
+  renderStages(poolItems);
   renderList(trashRoot, trashItems, "trash");
 
   if (cardCount) {
-    cardCount.textContent = `总计 ${allItems.length} 张卡片，常用 ${commonItems.length}，卡片池 ${poolItems.length}`;
+    cardCount.textContent = `总计 ${allItems.length} 张卡片，常用 ${commonItems.length}，其余 ${poolItems.length}`;
   }
   if (suppressAnimation) {
     requestAnimationFrame(() => {
       document.body.classList.remove("no-enter-anim");
     });
   }
+}
+
+function renderStages(poolItems) {
+  stagesRoot.innerHTML = "";
+  const grouped = new Map();
+  poolItems.forEach((item) => {
+    const cat = item.category || "未分类";
+    if (!grouped.has(cat)) {
+      grouped.set(cat, []);
+    }
+    grouped.get(cat).push(item);
+  });
+
+  const orderedCategories = [];
+  STAGE_ORDER.forEach((cat) => {
+    if (grouped.has(cat)) {
+      orderedCategories.push(cat);
+    }
+  });
+  grouped.forEach((_, cat) => {
+    if (!orderedCategories.includes(cat)) {
+      orderedCategories.push(cat);
+    }
+  });
+
+  orderedCategories.forEach((cat) => {
+    const items = grouped.get(cat);
+    if (!items || items.length === 0) {
+      return;
+    }
+    const details = document.createElement("details");
+    details.className = "zone stage-zone";
+    details.open = true;
+
+    const summary = document.createElement("summary");
+    const span = document.createElement("span");
+    span.textContent = cat;
+    summary.appendChild(span);
+    details.appendChild(summary);
+
+    const section = document.createElement("section");
+    section.className = "cards";
+    section.setAttribute("aria-label", cat + " 卡片列表");
+    const fragment = document.createDocumentFragment();
+    items.forEach((item, index) => {
+      const card = createCard(item, "pool", index);
+      fragment.appendChild(card);
+    });
+    section.appendChild(fragment);
+    details.appendChild(section);
+
+    stagesRoot.appendChild(details);
+  });
 }
 
 function renderList(root, items, zone) {
@@ -453,7 +511,7 @@ function createCard(item, zone, index) {
     node.setAttribute("draggable", "true");
     node.classList.add("draggable");
     bindDragEvents(node, item.id);
-    toggleBtn.textContent = "移到替补";
+    toggleBtn.textContent = "移除主力";
     toggleBtn.classList.add("warning");
   } else if (zone === "pool") {
     toggleBtn.textContent = "加入主力";
@@ -979,6 +1037,9 @@ function normalizeCommonIds(ids, items) {
 }
 
 function buildDefaultCommonIds(items) {
+  if (DEFAULT_COMMON_TITLES.length === 0) {
+    return [];
+  }
   const byTitle = new Map(items.map((item) => [item.title, item.id]));
   const selected = [];
 

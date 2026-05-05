@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>顶会写作技能</title>
+    <title>x2x5 博导技能</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -13,8 +13,7 @@
       <header class="hero">
         <div class="hero-head">
           <div class="hero-title-wrap">
-            <h1>顶会写作技能</h1>
-            <span class="hero-tip">支持拖动排序</span>
+            <h1>x2x5 博导技能</h1>
           </div>
           <div class="hero-actions">
             <button id="openAddBtn" class="open-add-btn" type="button">+ 新增卡片</button>
@@ -30,16 +29,12 @@
         <input id="manualFile" type="file" accept=".md,text/markdown" class="hidden" />
       </section>
 
-      <section class="zone common-zone" aria-label="主力卡片区">
+      <details class="zone common-zone" open aria-label="主力卡片区">
+        <summary><span>主力卡片</span></summary>
         <section id="commonRoot" class="cards" aria-label="主力卡片列表"></section>
-      </section>
-
-      <details id="poolPanel" class="zone pool-zone">
-        <summary>
-          <span>替补卡片</span>
-        </summary>
-        <section id="poolRoot" class="cards" aria-label="替补卡片列表"></section>
       </details>
+
+      <div id="stagesRoot" class="stages-container"></div>
 
       <details id="trashPanel" class="zone trash-zone">
         <summary>
@@ -49,12 +44,6 @@
         <section id="trashRoot" class="cards" aria-label="垃圾卡片列表"></section>
       </details>
 
-      <footer class="page-footer">
-        <span>skills 使用这个项目：</span>
-        <a href="https://github.com/Leey21/awesome-ai-research-writing" target="_blank" rel="noopener noreferrer">
-          awesome-ai-research-writing
-        </a>
-      </footer>
     </main>
 
     <div id="addModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="addModalTitle">
