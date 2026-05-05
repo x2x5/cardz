@@ -471,6 +471,14 @@ function renderList(root, items, zone) {
   root.appendChild(fragment);
 }
 
+function extractPlaceholder(prompt) {
+  const brackets = prompt.match(/【([^】]+)】/g);
+  if (brackets) {
+    return "粘贴" + brackets.map(b => b.slice(1, -1)).join("、") + "...";
+  }
+  return "把要处理的内容贴在这里...";
+}
+
 function createCard(item, zone, index) {
   const node = cardTemplate.content.firstElementChild.cloneNode(true);
   node.style.setProperty("--delay", `${Math.min(index * 40, 520)}ms`);
@@ -498,6 +506,7 @@ function createCard(item, zone, index) {
   title.textContent = item.title;
   subtitle.textContent = item.category || "未分类";
   subtitle.classList.remove("hidden");
+  input.placeholder = extractPlaceholder(item.prompt);
   preview.textContent = item.prompt;
   if (previewSummary) {
     const usage = document.createElement("span");
