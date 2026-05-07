@@ -50,11 +50,13 @@
     <div id="addModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="addModalTitle">
       <div id="addModalMask" class="modal-mask"></div>
       <section class="modal-panel">
-        <h3 id="addModalTitle" data-i18n="addCard">新增卡片</h3>
+        <div class="modal-panel-header">
+          <h3 id="addModalTitle" data-i18n="addCard">新增卡片</h3>
+          <span id="metaStatusText" class="meta-status modal-meta-status"></span>
+        </div>
         <details class="meta-template-panel">
           <summary>
             <span data-i18n="metaTemplate">创建技能</span>
-            <span id="metaStatusText" class="meta-status"></span>
           </summary>
           <textarea id="metaTemplateInput" readonly></textarea>
         </details>
@@ -62,8 +64,10 @@
           <span data-i18n="needLabel">需求</span>
           <textarea id="metaNeedInput" data-i18n-placeholder="metaPlaceholder" placeholder="例如：把论文 Introduction 压缩成顶会风格 Abstract，300字内。"></textarea>
         </label>
-        <div class="add-form-actions">
-          <button id="copyMetaBtn" class="create-btn" type="button" data-i18n="copyInput">复制输入</button>
+        <div class="add-form-actions add-form-actions-split">
+          <button id="copyMetaBtn" class="create-btn copy-meta-btn" type="button" data-i18n="copyInput">复制输入</button>
+          <a href="https://gemini.google.com/app" target="_blank" rel="noopener" class="create-btn external-link-btn gemini-btn">Gemini</a>
+          <a href="https://chatgpt.com/" target="_blank" rel="noopener" class="create-btn external-link-btn gpt-btn">ChatGPT</a>
         </div>
         <label>
           Skills
@@ -82,18 +86,7 @@
           <div class="card-head-top">
             <h2 class="card-title"></h2>
             <span class="card-usage cnode-usage"></span>
-            <div class="card-icon-actions">
-              <button class="icon-btn edit-btn" type="button" data-i18n-tooltip="editCard" aria-label="Edit Card" title="Edit Card">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M3 17.25V21h3.75L19.81 7.94l-3.75-3.75L3 17.25zm14.71-9.04a1 1 0 0 0 0-1.41l-1.5-1.5a1 1 0 0 0-1.41 0l-1.13 1.12 3.75 3.75 1.29-1.96z"/>
-                </svg>
-              </button>
-              <button class="icon-btn delete-btn hidden" type="button" data-i18n-tooltip="deleteCard" aria-label="Delete Card" title="Delete Card">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M6 7h12l-1 14H7L6 7zm3-3h6l1 1h4v2H4V5h4l1-1z"/>
-                </svg>
-              </button>
-            </div>
+            <div class="card-icon-actions"></div>
           </div>
         </header>
         <textarea class="card-input cnode-textarea"></textarea>
@@ -118,6 +111,11 @@
             <button class="cancel-edit-btn" type="button" data-i18n="cancel">取消</button>
           </div>
         </section>
+        <button class="card-delete-fold hidden" type="button" data-i18n-tooltip="deleteCard" aria-label="Delete Card" title="Delete Card">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 7h12l-1 14H7L6 7zm3-3h6l1 1h4v2H4V5h4l1-1z"/>
+          </svg>
+        </button>
         <p class="copy-status" aria-live="polite"></p>
       </article>
     </template>

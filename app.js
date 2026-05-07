@@ -53,7 +53,7 @@ const UI_STRINGS = {
     pleaseFillInput: "请先在输入区填写内容",
     copiedSuccess: "已复制",
     pleaseFillNeed: "请先填写需求",
-    copiedMeta: "已复制元模板 + 需求",
+    copiedMeta: "已复制",
     copyFailedManual: "复制失败，请手动复制",
     pleasePasteFull: "请粘贴完整内容：第一行标题，后续为 skills 模板",
     load: "加载",
@@ -138,7 +138,7 @@ const UI_STRINGS = {
     pleaseFillInput: "Please fill in the input area first",
     copiedSuccess: "Copied",
     pleaseFillNeed: "Please fill in the requirement",
-    copiedMeta: "Meta template + requirement copied",
+    copiedMeta: "Copied",
     copyFailedManual: "Copy failed, please copy manually",
     pleasePasteFull: "Please paste complete content: first line is title, followed by skills template",
     load: "Load",
@@ -286,7 +286,10 @@ const META_TEMPLATE_TEXT_ZH = `# Role
 1. 专业度：生成的约束条件（Constraints）必须直击痛点。比如如果是学术写作任务，你要自动帮我加上"学术客观语气"、"避免使用过度口语化的副词"等专业规则。
 2. 零废话：只输出生成好的提示词模板本身，不要加任何诸如"好的，我为您生成"之类的寒暄废话。
 3. 语言：输出的提示词模板使用中文。
-4. 输出格式补充：最终输出的第一行必须是标题（仅标题，不加解释），且必须为中文短标题，严格控制在 4-5 个字；从第二行开始输出完整 skills 模板正文。
+4. 输出格式（严格按以下顺序，不要打乱）：
+   - 第一行：标题（仅标题，不加解释）。以动词开头，简短有力，严格控制在 4-5 个字以内，例如"写作摘要"、"汇总文献"。
+   - 第二行：hint: xxx。用一句话告诉用户应该在这个卡片里粘贴什么内容，例如"粘贴论文的 Introduction 段落"。这行必须以 "hint:" 开头。
+   - 第三行开始：完整 skills 模板正文（包含 Role、Task、Constraints、Input 四个部分）。
 
 # Input (我的核心需求)
 [在这里填写你的具体需求，例如：我想把一篇论文的 Introduction 喂给 AI，让它帮我写出一篇不超过300字的 Abstract，要有逻辑感，符合计算机顶会的风格。]`;
@@ -312,7 +315,10 @@ Your output prompt must include the following four parts, formatted clearly:
 1. Professionalism: Generated constraints must hit the pain point. For example, for academic writing tasks, automatically add professional rules like "academic objective tone", "avoid overly colloquial adverbs".
 2. No fluff: Only output the generated prompt template itself, no chit-chat like "Sure, here's what I generated".
 3. Language: Output the prompt template in English.
-4. Output format note: The first line of the final output must be a title (title only, no explanation), a short English title of 4-8 words; from the second line onwards, output the complete skills template body.
+4. Output format (strictly follow this order):
+   - First line: title (title only, no explanation). Start with a verb, keep it short and punchy, within 4-8 words, e.g., "Write Abstract", "Summarize Papers".
+   - Second line: hint: xxx. One sentence telling the user what to paste into this card, e.g., "Paste your paper's Introduction paragraph". This line MUST start with "hint:".
+   - From the third line onwards: complete skills template body (including Role, Task, Constraints, Input).
 
 # Input (My Core Requirement)
 [Fill in your specific requirement here, e.g., I want to feed a paper's Introduction to AI and have it write an Abstract of no more than 300 words, with logical flow, in the style of top CS conferences.]`;
@@ -852,8 +858,8 @@ function renderStages(stageItems) {
   const grouped = new Map();
 
   stageItems.forEach((item) => {
-    if (item.source !== "base") return;
     const stageNum = item.stageNum || "0";
+    if (stageNum === "0") return;
     if (!grouped.has(stageNum)) {
       grouped.set(stageNum, []);
     }
@@ -1096,8 +1102,7 @@ function createCard(item, zone, index) {
   const input = node.querySelector(".card-input");
   const copyBtn = node.querySelector(".copy-btn");
   const previewToggleBtn = node.querySelector(".preview-toggle-btn");
-  const editBtn = node.querySelector(".edit-btn");
-  const deleteBtn = node.querySelector(".delete-btn");
+  const deleteBtn = node.querySelector(".card-delete-fold");
   const status = node.querySelector(".copy-status");
   const preview = node.querySelector(".card-preview");
   const previewPre = preview ? preview.querySelector("pre") : null;
@@ -1134,10 +1139,9 @@ function createCard(item, zone, index) {
 
   const isCustomCard = item.source === "custom";
   if (isCustomCard) {
-    editBtn.classList.remove("hidden");
+    title.classList.add("editable-title");
     deleteBtn.classList.remove("hidden");
   } else {
-    editBtn.classList.add("hidden");
     deleteBtn.classList.add("hidden");
   }
 
@@ -1163,7 +1167,8 @@ function createCard(item, zone, index) {
     }
   });
 
-  editBtn.addEventListener("click", () => {
+  title.addEventListener("click", () => {
+    if (!isCustomCard) return;
     if (node.querySelector(".inline-title-edit")) return;
     const inlineInput = document.createElement("input");
     inlineInput.type = "text";
@@ -1248,7 +1253,7 @@ function bindAddCardPanel() {
       metaNeedInput.focus();
       return;
     }
-    const output = META_TEMPLATE_TEXT.replace(META_INPUT_PLACEHOLDER, need);
+    const output = getMetaTemplateText().replace(getMetaInputPlaceholder(), need);
     try {
       await copyToClipboard(output);
       metaStatusText.textContent = t("copiedMeta");
@@ -1266,7 +1271,7 @@ function bindAddCardPanel() {
       addStatusText.className = "add-status error";
       return;
     }
-    addNewCard(parsed.title, parsed.prompt);
+    addNewCard(parsed.title, parsed.prompt, parsed.hint);
     closeAddPanel();
   });
 
@@ -1356,11 +1361,23 @@ function parseGeneratedSkill(rawText) {
     .replace(/^#+\s*/, "")
     .replace(/^标题[:：]\s*/i, "")
     .trim();
-  const prompt = nonEmpty.slice(1).join("\n").trim();
-  if (!title || !prompt) {
-    return null;
+  if (!title) return null;
+
+  let hint = "";
+  let promptLines = nonEmpty.slice(1);
+
+  if (promptLines.length > 0) {
+    const hintMatch = promptLines[0].match(/^hint[:：]\s*(.+)$/i);
+    if (hintMatch) {
+      hint = hintMatch[1].trim();
+      promptLines = promptLines.slice(1);
+    }
   }
-  return { title, prompt };
+
+  const prompt = promptLines.join("\n").trim();
+  if (!prompt) return null;
+
+  return { title, hint, prompt };
 }
 
 document.addEventListener("keydown", (event) => {
@@ -1447,13 +1464,14 @@ function removeFromCommon(cardId) {
   commitState();
 }
 
-function addNewCard(title, prompt) {
+function addNewCard(title, prompt, hint) {
   const id = buildCustomCardId();
   let category = "未分类";
   let stageId = "";
+  let stageNum = "";
 
   if (pendingStageId.startsWith("builtin:")) {
-    const stageNum = pendingStageId.slice(8);
+    stageNum = pendingStageId.slice(8);
     category = t("stage" + stageNum);
   } else if (pendingStageId) {
     const stage = state.customStages.find((s) => s.id === pendingStageId);
@@ -1461,7 +1479,7 @@ function addNewCard(title, prompt) {
     stageId = pendingStageId;
   }
 
-  state.customCards.push({ id, title, category, prompt, stageId });
+  state.customCards.push({ id, title, category, prompt, stageId, stageNum, hint });
   pendingStageId = "";
   commitState();
 }
@@ -1646,8 +1664,8 @@ function seedDefaultUserCards() {
     }
   }
   if (state.userCardsSeeded) {
-    // Migrate old cards without stageId into a new stage
-    const orphanCards = state.customCards.filter((c) => !c.stageId);
+    // Migrate old cards without stageId and without stageNum into a new stage
+    const orphanCards = state.customCards.filter((c) => !c.stageId && !c.stageNum);
     if (orphanCards.length > 0) {
       const stageId = state.customStages.length > 0
         ? state.customStages[0].id
@@ -1763,7 +1781,9 @@ function normalizeState(raw) {
         title: String(card.title || "").trim(),
         category: String(card.category || "").trim() || "未分类",
         prompt: String(card.prompt || "").trim(),
+        hint: card.hint ? String(card.hint).trim() : "",
         stageId: card.stageId ? String(card.stageId).trim() : "",
+        stageNum: card.stageNum ? String(card.stageNum).trim() : "",
       }))
       .filter((card) => card.id && card.title && card.prompt);
     // Preserve cards without stageId for migration in seedDefaultUserCards
@@ -1904,6 +1924,11 @@ function setStatus(element, text, stateClass) {
   if (stateClass) {
     element.classList.add(stateClass);
   }
+  clearTimeout(element._clearTimer);
+  element._clearTimer = setTimeout(() => {
+    element.textContent = "";
+    element.classList.remove("success", "error");
+  }, 2000);
 }
 
 function showNotice(text) {
