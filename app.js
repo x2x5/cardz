@@ -15,6 +15,9 @@ const UI_STRINGS = {
     cardManagement: "卡子",
     clearUsage: "清理次数",
     clearCache: "清除缓存",
+    clearCacheConfirm: "用户自定义卡片和收藏的卡片将会丢失，你确定吗？",
+    exportCards: "导出",
+    exportEmpty: "没有用户卡片可导出",
     switchLang: "切换语言",
     promptZh: "提示词 中",
     promptEn: "EN",
@@ -106,6 +109,9 @@ const UI_STRINGS = {
     cardManagement: "Cardz",
     clearUsage: "Reset Usage",
     clearCache: "Clear Cache",
+    clearCacheConfirm: "Custom cards and favorites will be lost. Are you sure?",
+    exportCards: "Export",
+    exportEmpty: "No user cards to export",
     switchLang: "Switch Language",
     promptZh: "Prompt ZH",
     promptEn: "EN",
@@ -554,6 +560,13 @@ function updateSkillLang(newLang) {
   document.querySelectorAll("#skillLangWrap .segment-btn").forEach((b) => {
     b.classList.toggle("active", b.dataset.lang === currentPromptLang);
   });
+
+  if (metaTemplateInput) {
+    metaTemplateInput.value = getMetaTemplateText();
+  }
+  if (metaNeedInput) {
+    metaNeedInput.placeholder = getMetaInputPlaceholder();
+  }
 
   refreshAllItems();
   render();
@@ -2102,7 +2115,60 @@ if (resetUsageMenuBtn) {
 
 if (clearCacheMenuBtn) {
   clearCacheMenuBtn.addEventListener("click", () => {
-    localStorage.clear();
-    location.reload();
+    if (confirm(t("clearCacheConfirm"))) {
+      localStorage.clear();
+      location.reload();
+    } else {
+      settingsMenu.classList.add("hidden");
+    }
   });
+}
+
+/* ── Export User Cards ── */
+const exportBtn = document.getElementById("exportBtn");
+if (exportBtn) {
+  exportBtn.addEventListener("click", () => {
+    exportUserCards();
+  });
+}
+
+function exportUserCards() {
+  const cards = (state.customCards || []).filter((c) => c.lang === uiLang);
+  if (cards.length === 0) {
+    alert(t("exportEmpty"));
+    return;
+  }
+
+  const title = uiLang === "zh" ? "用户自定义卡片" : "User Custom Cards";
+  const lines = [`# ${title}`, ""];
+
+  cards.forEach((card) => {
+    lines.push(`## ${card.title || "Untitled"}`);
+    lines.push("");
+    if (card.category) {
+      lines.push(`**${uiLang === "zh" ? "分类" : "Category"}:** ${card.category}`);
+    }
+    if (card.hint) {
+      lines.push(`**${uiLang === "zh" ? "提示" : "Hint"}:** ${card.hint}`);
+    }
+    lines.push("");
+    if (card.prompt) {
+      lines.push("```markdown");
+      lines.push(card.prompt);
+      lines.push("```");
+    }
+    lines.push("");
+    lines.push("---");
+    lines.push("");
+  });
+
+  const blob = new Blob([lines.join("\n")], { type: "text/markdown;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `cardz-user-cards-${new Date().toISOString().slice(0, 10)}.md`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
 }
