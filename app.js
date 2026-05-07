@@ -529,25 +529,52 @@ function bindZoneToggleListeners() {
   });
 }
 
-function updateFooterTime() {
+async function fetchLastCommitTime() {
+  const cacheKey = "cardz-last-commit-time";
+  const cacheDateKey = "cardz-last-commit-date";
+  const today = new Date().toDateString();
+  const cached = localStorage.getItem(cacheKey);
+  const cachedDate = localStorage.getItem(cacheDateKey);
+
+  if (cached && cachedDate === today) {
+    return new Date(cached);
+  }
+
+  try {
+    const resp = await fetch("https://api.github.com/repos/x2x5/cardz/commits?per_page=1", {
+      headers: { Accept: "application/vnd.github.v3+json" },
+    });
+    if (!resp.ok) throw new Error("API failed");
+    const data = await resp.json();
+    const date = new Date(data[0].commit.committer.date);
+    localStorage.setItem(cacheKey, date.toISOString());
+    localStorage.setItem(cacheDateKey, today);
+    return date;
+  } catch (e) {
+    return cached ? new Date(cached) : null;
+  }
+}
+
+async function updateFooterTime() {
   const el = document.getElementById("updateTimeText");
   if (!el) return;
-  const lastMod = new Date(document.lastModified);
-  const y = lastMod.getFullYear();
-  const m = lastMod.getMonth() + 1;
-  const d = lastMod.getDate();
-  const h = String(lastMod.getHours()).padStart(2, "0");
-  const min = String(lastMod.getMinutes()).padStart(2, "0");
-  const s = String(lastMod.getSeconds()).padStart(2, "0");
+  const date = await fetchLastCommitTime();
+  if (!date) return;
+  const y = date.getFullYear();
+  const m = date.getMonth() + 1;
+  const d = date.getDate();
+  const h = String(date.getHours()).padStart(2, "0");
+  const min = String(date.getMinutes()).padStart(2, "0");
+  const s = String(date.getSeconds()).padStart(2, "0");
   if (uiLang === "zh") {
     el.textContent = `${y}年${m}月${d}日 ${h}时${min}分${s}秒`;
   } else {
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    el.textContent = `${monthNames[lastMod.getMonth()]} ${d}, ${y} at ${h}:${min}:${s}`;
+    el.textContent = `${monthNames[date.getMonth()]} ${d}, ${y} at ${h}:${min}:${s}`;
   }
 }
 
-function updateUiLang(newLang) {
+async function updateUiLang(newLang) {
   uiLang = newLang;
   localStorage.setItem("ui-lang", uiLang);
   applyStaticI18n();
@@ -571,7 +598,7 @@ function updateUiLang(newLang) {
     render();
   }
 
-  updateFooterTime();
+  await updateFooterTime();
 }
 
 function updateSkillLang(newLang) {
@@ -627,7 +654,7 @@ async function init() {
   }
 
   switchToLayout1();
-  updateFooterTime();
+  await updateFooterTime();
 }
 
 async function fetchSkills(source) {
