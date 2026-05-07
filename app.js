@@ -18,6 +18,7 @@ const UI_STRINGS = {
     clearCacheConfirm: "用户自定义卡片和收藏的卡片将会丢失，你确定吗？",
     exportCards: "导出",
     exportEmpty: "没有用户卡片可导出",
+    updatedAt: "更新于",
     switchLang: "切换语言",
     promptZh: "提示词 中",
     promptEn: "EN",
@@ -112,6 +113,7 @@ const UI_STRINGS = {
     clearCacheConfirm: "Custom cards and favorites will be lost. Are you sure?",
     exportCards: "Export",
     exportEmpty: "No user cards to export",
+    updatedAt: "Updated on",
     switchLang: "Switch Language",
     promptZh: "Prompt ZH",
     promptEn: "EN",
@@ -527,6 +529,24 @@ function bindZoneToggleListeners() {
   });
 }
 
+function updateFooterTime() {
+  const el = document.getElementById("updateTimeText");
+  if (!el) return;
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = now.getMonth() + 1;
+  const d = now.getDate();
+  const h = String(now.getHours()).padStart(2, "0");
+  const min = String(now.getMinutes()).padStart(2, "0");
+  const s = String(now.getSeconds()).padStart(2, "0");
+  if (uiLang === "zh") {
+    el.textContent = `${y}年${m}月${d}日 ${h}时${min}分${s}秒`;
+  } else {
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    el.textContent = `${monthNames[now.getMonth()]} ${d}, ${y} at ${h}:${min}:${s}`;
+  }
+}
+
 function updateUiLang(newLang) {
   uiLang = newLang;
   localStorage.setItem("ui-lang", uiLang);
@@ -550,6 +570,8 @@ function updateUiLang(newLang) {
     layout1Rendered = false;
     render();
   }
+
+  updateFooterTime();
 }
 
 function updateSkillLang(newLang) {
@@ -605,6 +627,7 @@ async function init() {
   }
 
   switchToLayout1();
+  updateFooterTime();
 }
 
 async function fetchSkills(source) {
