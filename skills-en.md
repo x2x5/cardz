@@ -2,9 +2,9 @@
 
 ---
 
-## Stage 1: Topic Selection & Research
+## Stage 1: Research & Select Topics
 
-### Literature Search Strategy
+### Search Literature
 
 ````markdown
 # Role
@@ -43,7 +43,7 @@ Based on the [research interest or topic keywords] I provide, generate a systema
 hint: Paste your research direction, keywords of interest, or a brief research description here
 ---
 
-### Paper Deep Reading Notes
+### Read Papers Deeply
 
 ````markdown
 # Role
@@ -80,7 +80,7 @@ Perform a deep reading analysis of the [paper content (abstract, methods, experi
 hint: Paste the paper's abstract, method description, experimental results, etc. here, or upload PDF
 ---
 
-### Research Landscape Mapping
+### Map the Landscape
 
 ````markdown
 # Role
@@ -116,7 +116,7 @@ Based on the [research direction] and [information from several representative p
 hint: Paste your research direction, a list of known representative papers, or a brief description of the field here
 ---
 
-### Failure Scenario Design
+### Probe Failure Cases
 
 ````markdown
 # Role
@@ -156,7 +156,7 @@ Based on the [target model/method description and its known capabilities] I prov
 hint: Paste the target model/method description, known capability range, existing test results, or known failure cases here
 ---
 
-### Existing Benchmark Analysis
+### Analyze Benchmarks
 
 ````markdown
 # Role
@@ -195,9 +195,9 @@ Based on the [research field and related benchmark list] I provide, systematical
 hint: Paste your research field, known benchmark list (name + brief description), and evaluation dimensions you are particularly interested in here
 ---
 
-## Stage 2: Idea Conception
+## Stage 2: Conceive Ideas
 
-### Research Idea Brainstorming
+### Brainstorm Ideas
 
 ````markdown
 # Role
@@ -237,7 +237,7 @@ Based on the [research background, existing work information, or preliminary ide
 hint: Paste paper abstracts, method highlights, your preliminary ideas, or a description of the research direction here
 ---
 
-### Feasibility Assessment
+### Assess Feasibility
 
 ````markdown
 # Role
@@ -279,7 +279,7 @@ Conduct a comprehensive feasibility assessment of the [research idea] I propose,
 hint: Paste your research idea description, including your envisioned method, target datasets, expected contributions, etc.
 ---
 
-### Innovation Point Extraction
+### Distill Innovations
 
 ````markdown
 # Role
@@ -319,7 +319,7 @@ Based on the [research idea or core description of paper draft] I provide, help 
 hint: Paste your research idea description, method overview, or core content of paper draft, and indicate target venue, e.g., NeurIPS 2026 / CVPR 2027
 ---
 
-### Method Transfer Assessment
+### Assess Method Transfer
 
 ````markdown
 # Role
@@ -357,7 +357,7 @@ Based on the [source domain Method A and target domain Problem B] I provide, ass
 hint: Paste the source domain Method A description (core mechanisms, key innovations) and target domain Problem B description (task definition, limitations of existing methods) here
 ---
 
-### Reverse Hypothesis Verification
+### Verify Reverse Hypotheses
 
 ````markdown
 # Role
@@ -396,7 +396,7 @@ Based on the [research field and related method descriptions] I provide, identif
 hint: Paste your research field description, related method list, and assumptions you believe may be problematic (if any) here
 ---
 
-### Task Definition
+### Define Tasks
 
 ````markdown
 # Role
@@ -437,9 +437,9 @@ Based on the [vague research idea or observation] I provide, help me formalize i
 hint: Paste your vague research idea, observed phenomenon, or intuitively valuable direction here
 ---
 
-## Stage 3: Method Design
+## Stage 3: Design Methods
 
-### Method Architecture Design
+### Design Architectures
 
 ````markdown
 # Role
@@ -478,7 +478,7 @@ Based on the [research problem, core idea, and constraints] I provide, help me d
 hint: Paste your research problem, core idea, existing technical constraints (e.g., "must be compatible with Transformer architecture"), and your preliminary design (if any) here
 ---
 
-### Loss Function & Optimization Strategy
+### Design Training Objectives
 
 ````markdown
 # Role
@@ -518,7 +518,7 @@ Based on the [task objective, data characteristics, and method architecture] I d
 hint: Paste your task description (e.g., classification, generation, detection), data characteristics (scale, distribution), and method architecture overview here
 ---
 
-### Conceptual Figure Design Guide
+### Design Conceptual Figures
 
 ````markdown
 # Role
@@ -560,7 +560,7 @@ Based on the [method overview] I provide, design a detailed plan for a paper con
 hint: Paste your method overview, key modules, and data flow description here
 ---
 
-### Data Construction Pipeline
+### Construct Data
 
 ````markdown
 # Role
@@ -599,7 +599,7 @@ Based on the [target task description and data requirements] I provide, help me 
 hint: Paste target task description (task type, input/output format), data requirements (scale, diversity needs), available seed data or reference data here
 ---
 
-### Contrastive Learning Design
+### Design Contrastive Learning
 
 ````markdown
 # Role
@@ -638,7 +638,7 @@ Based on the [task scenario and data characteristics] I provide, help me design 
 hint: Paste your task description (task type, data format), data scale and characteristics, and existing annotation information here
 ---
 
-### Workflow Structure Analysis
+### Analyze Workflows
 
 ````markdown
 # Role
@@ -678,7 +678,7 @@ Based on the [target task and processing requirements] I provide, help me analyz
 hint: Paste your target task description, rough ideas for processing steps, and performance/cost constraints here
 ---
 
-### Multi-Stage System Design
+### Design Multi-Stage Systems
 
 ````markdown
 # Role
@@ -718,7 +718,7 @@ Based on the [system objective and constraints] I provide, help me design a comp
 hint: Paste system objective, constraints (latency, cost, accuracy requirements), and existing technical components here
 ---
 
-### Human-AI Collaboration Design
+### Design Human-AI Collaboration
 
 ````markdown
 # Role
@@ -758,9 +758,9 @@ Based on the [task scenario and collaboration objectives] I provide, help me des
 hint: Paste task scenario description, collaboration objectives, human user background, and available time here
 ---
 
-## Stage 4: Experiment Execution
+## Stage 4: Run Experiments
 
-### Experiment Plan Design
+### Design Experiments
 
 ````markdown
 # Role
@@ -802,7 +802,7 @@ Based on my [research method and core contribution points], help me design a com
 hint: Paste your method overview, core contribution points (1-3), available datasets, and computational resource situation here
 ---
 
-### Ablation Experiment Design
+### Design Ablations
 
 ````markdown
 # Role
@@ -846,7 +846,7 @@ Based on the [method architecture and core modules] I provide, help me design a 
 hint: Paste your method architecture description, listing all core modules and design decisions here
 ---
 
-### Experiment Results Analysis
+### Analyze Results
 
 ````markdown
 # Role
@@ -884,7 +884,7 @@ Carefully read the [experimental data] I provide, extract key features, trends, 
 hint: Paste your experimental results data (recommended: directly copy Excel/CSV raw table, preserving row-column structure), and briefly describe the core conclusions you want to emphasize through this data
 ---
 
-### Failure Case Analysis
+### Analyze Failure Cases
 
 ````markdown
 # Role
@@ -924,7 +924,7 @@ Based on the [model failure case data] I provide, help me systematically analyze
 hint: Paste failure case data (input, expected output, actual output), along with task description and model information here
 ---
 
-### Stress Test Benchmark Construction
+### Build Stress Tests
 
 ````markdown
 # Role
@@ -963,7 +963,7 @@ Based on the [target model capabilities and known weaknesses] I provide, help me
 hint: Paste target model capability description, known weaknesses, and existing evaluation results here
 ---
 
-### Evaluation Protocol Design
+### Design Evaluation Protocols
 
 ````markdown
 # Role
@@ -1003,7 +1003,7 @@ Based on the [research task and evaluation needs] I provide, help me design a co
 hint: Paste research task description, existing evaluation methods (if any), and common evaluation requirements of the target conference here
 ---
 
-### Data Quality Assessment
+### Assess Data Quality
 
 ````markdown
 # Role
@@ -1045,7 +1045,7 @@ Based on the [dataset description and sample data] I provide, help me design a d
 hint: Paste dataset description (scale, source, annotation method), sample examples, and data generation method (if applicable) here
 ---
 
-### Computational Cost Analysis
+### Analyze Computational Cost
 
 ````markdown
 # Role
@@ -1088,7 +1088,7 @@ Based on the [method architecture and experimental setup] I provide, help me ana
 hint: Paste method architecture description, model scale parameters, training/inference settings, and available hardware resources here
 ---
 
-### Collaboration Interface Evaluation
+### Evaluate Collaboration Interfaces
 
 ````markdown
 # Role
@@ -1130,9 +1130,9 @@ Based on the [collaboration interface design and target user group] I provide, h
 hint: Paste collaboration interface design description, target user group characteristics, and core usage scenarios here
 ---
 
-## Stage 5: Paper Writing
+## Stage 5: Write Papers
 
-### Abstract Writing
+### Write Abstracts
 
 ````markdown
 # Role
@@ -1171,7 +1171,7 @@ Based on the [research background, method overview, and experimental conclusions
 hint: Paste your paper title, research background, method overview (2-3 sentences), core experimental results (dataset name + specific numbers), and target conference here
 ---
 
-### Introduction Writing
+### Write Introductions
 
 ````markdown
 # Role
@@ -1209,7 +1209,7 @@ Based on the [research background, problem definition, method overview, and cont
 hint: Paste your paper title, research background, brief survey and limitations of existing methods, your method overview (2-3 sentences), and core contribution points (3) here
 ---
 
-### Related Work Writing
+### Write Related Work
 
 ````markdown
 # Role
@@ -1251,7 +1251,7 @@ Based on the [research direction, related work list, and my method's positioning
 hint: Paste your research direction, related work list (paper title + one-sentence description), and your method's core innovation points here
 ---
 
-### Method Section Writing
+### Write Methods
 
 ````markdown
 # Role
@@ -1291,7 +1291,7 @@ Based on the [method architecture description, key formulas, and module descript
 hint: Paste your method architecture description, core module list, key formulas, and notation definitions (if any) here
 ---
 
-### Experiments Section Writing
+### Write Experiments
 
 ````markdown
 # Role
@@ -1338,7 +1338,7 @@ Based on the [experimental setup, results data, and analysis conclusions] I prov
 hint: Paste your experimental setup (datasets, baselines, metrics), experimental results data (recommended table format), ablation experiment data, and the core conclusions you want to emphasize here
 ---
 
-### Critical Analysis Writing
+### Write Critical Analysis
 
 ````markdown
 # Role
@@ -1377,9 +1377,9 @@ Based on the [analysis target and evidence materials] I provide, help me write a
 hint: Paste the target of your critical analysis (method, assumption, or evaluation approach), your available evidence (experimental data, counterexamples, theoretical analysis), and where this analysis sits in the paper here
 ---
 
-## Stage 6: Review & Revision
+## Stage 6: Review & Revise
 
-### Paragraph-Level Language Review
+### Review Language
 
 ````markdown
 # Role
@@ -1414,7 +1414,7 @@ Perform a sentence-level language review of the [paper paragraph (English LaTeX)
 hint: Paste your English LaTeX paper paragraph(s), which can be a single section or the entire paper
 ---
 
-### Paper Consistency Review
+### Review Consistency
 
 ````markdown
 # Role
@@ -1453,9 +1453,9 @@ Perform a cross-section consistency review of the [paper section contents (Intro
 hint: Paste the paper's Introduction contribution claims, Method section summary, Experiments section setup and main results table, and key methods mentioned in Related Work here
 ---
 
-## Stage 7: Submission & Preparation
+## Stage 7: Prepare for Submission
 
-### Submission Checklist Review
+### Check Submission List
 
 ````markdown
 # Role
@@ -1494,7 +1494,7 @@ Based on the target conference's submission requirements, review the [paper info
 hint: Paste target conference name and deadline, paper title, Abstract, page count, template used, and any specific questions about compliance here
 ---
 
-### Rebuttal Writing
+### Write Rebuttals
 
 ````markdown
 # Role
@@ -1537,7 +1537,7 @@ Based on the [reviewer comments (reviews from multiple reviewers)] and [key poin
 hint: Paste each reviewer's complete review comments, and the core response points you want to emphasize here
 ---
 
-### Paper Compression & Page Control
+### Compress Papers
 
 ````markdown
 # Role
