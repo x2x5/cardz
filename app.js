@@ -1,5 +1,8 @@
 "use strict";
 
+// 每次推送到 GitHub 前手动更新此时间戳
+const BUILD_TIME = "2026-05-08T16:30:00+08:00";
+
 const STORAGE_KEY = "prompt-card-layout-v3";
 const PRIMARY_DATA_SOURCE_ZH = "./skills.md";
 const PRIMARY_DATA_SOURCE_EN = "./skills-en.md";
@@ -529,37 +532,10 @@ function bindZoneToggleListeners() {
   });
 }
 
-async function fetchLastCommitTime() {
-  const cacheKey = "cardz-last-commit-time";
-  const cacheDateKey = "cardz-last-commit-date";
-  const today = new Date().toDateString();
-  const cached = localStorage.getItem(cacheKey);
-  const cachedDate = localStorage.getItem(cacheDateKey);
-
-  if (cached && cachedDate === today) {
-    return new Date(cached);
-  }
-
-  try {
-    const resp = await fetch("https://api.github.com/repos/x2x5/cardz/commits?per_page=1", {
-      headers: { Accept: "application/vnd.github.v3+json" },
-    });
-    if (!resp.ok) throw new Error("API failed");
-    const data = await resp.json();
-    const date = new Date(data[0].commit.committer.date);
-    localStorage.setItem(cacheKey, date.toISOString());
-    localStorage.setItem(cacheDateKey, today);
-    return date;
-  } catch (e) {
-    return cached ? new Date(cached) : null;
-  }
-}
-
-async function updateFooterTime() {
+function updateFooterTime() {
   const el = document.getElementById("updateTimeText");
   if (!el) return;
-  const date = await fetchLastCommitTime();
-  if (!date) return;
+  const date = new Date(BUILD_TIME);
   const y = date.getFullYear();
   const m = date.getMonth() + 1;
   const d = date.getDate();
@@ -574,7 +550,7 @@ async function updateFooterTime() {
   }
 }
 
-async function updateUiLang(newLang) {
+function updateUiLang(newLang) {
   uiLang = newLang;
   localStorage.setItem("ui-lang", uiLang);
   applyStaticI18n();
@@ -598,7 +574,7 @@ async function updateUiLang(newLang) {
     render();
   }
 
-  await updateFooterTime();
+  updateFooterTime();
 }
 
 function updateSkillLang(newLang) {
@@ -654,7 +630,7 @@ async function init() {
   }
 
   switchToLayout1();
-  await updateFooterTime();
+  updateFooterTime();
 }
 
 async function fetchSkills(source) {
