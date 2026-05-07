@@ -532,18 +532,18 @@ function bindZoneToggleListeners() {
 function updateFooterTime() {
   const el = document.getElementById("updateTimeText");
   if (!el) return;
-  const now = new Date();
-  const y = now.getFullYear();
-  const m = now.getMonth() + 1;
-  const d = now.getDate();
-  const h = String(now.getHours()).padStart(2, "0");
-  const min = String(now.getMinutes()).padStart(2, "0");
-  const s = String(now.getSeconds()).padStart(2, "0");
+  const lastMod = new Date(document.lastModified);
+  const y = lastMod.getFullYear();
+  const m = lastMod.getMonth() + 1;
+  const d = lastMod.getDate();
+  const h = String(lastMod.getHours()).padStart(2, "0");
+  const min = String(lastMod.getMinutes()).padStart(2, "0");
+  const s = String(lastMod.getSeconds()).padStart(2, "0");
   if (uiLang === "zh") {
     el.textContent = `${y}年${m}月${d}日 ${h}时${min}分${s}秒`;
   } else {
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    el.textContent = `${monthNames[now.getMonth()]} ${d}, ${y} at ${h}:${min}:${s}`;
+    el.textContent = `${monthNames[lastMod.getMonth()]} ${d}, ${y} at ${h}:${min}:${s}`;
   }
 }
 
