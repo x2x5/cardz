@@ -11,30 +11,22 @@ let baseCardIds = [];
 // ── UI i18n ──
 const UI_STRINGS = {
   zh: {
-    siteTitle: "ScholarCanvas 学术画布",
-    cardManagement: "卡片管理",
+    siteTitle: "卡子",
+    cardManagement: "卡子",
     clearUsage: "清空次数",
-    apiConfig: "API 配置",
     switchLang: "切换语言",
     promptZh: "提示词 中",
     promptEn: "EN",
     outputZh: "输出 中",
     outputEn: "EN",
     addCard: "新增卡片",
-    metaTemplate: "元模板",
+    metaTemplate: "创建技能",
     needLabel: "需求",
     metaPlaceholder: "例如：把论文 Introduction 压缩成顶会风格 Abstract，300字内。",
     copyInput: "复制输入",
-    aiGenerate: "AI 生成",
     promptPlaceholder: "粘贴 AI 返回内容：第一行写标题，后续写完整 skills 模板。",
     createCard: "创建卡片",
     cancel: "取消",
-    apiConfigTitle: "API 配置",
-    vendor: "供应商",
-    apiUrl: "API 地址",
-    model: "模型",
-    saveSettings: "保存设置",
-    close: "关闭",
     back: "返回",
     editCard: "修改卡片",
     deleteCard: "删除卡片",
@@ -58,25 +50,17 @@ const UI_STRINGS = {
     emptyBench: "替补卡片暂无卡片",
     emptyCards: "暂无卡片",
     emptyTrash: "清空回收站",
-    pleaseConfigApi: "请先在右上角 API 配置中填写 API Key",
     pleaseFillInput: "请先在输入区填写内容",
-    cancelled: "已取消",
-    genFailed: "生成失败：",
     copiedSuccess: "已复制",
     pleaseFillNeed: "请先填写需求",
     copiedMeta: "已复制元模板 + 需求",
     copyFailedManual: "复制失败，请手动复制",
     pleasePasteFull: "请粘贴完整内容：第一行标题，后续为 skills 模板",
-    connectingAi: "正在连接 AI...",
-    saved: "已保存",
     load: "加载",
     delete: "删除",
     pleaseEnterName: "请输入名称",
     invalidFormat: "文件格式无效",
     fileParseFailed: "文件解析失败",
-    generating: "生成中",
-    failed: "失败：",
-    done: "完成",
     selectLocalFile: "选择本地 skills.md",
     inputPlaceholder: "输入区：把要处理的内容贴在这里...",
     outputPlaceholder: "AI 输出结果...",
@@ -95,11 +79,6 @@ const UI_STRINGS = {
     trashWithCount: "回收站 ({count})",
     empty: "清空",
     noCardsInStage: "暂无卡片",
-    configApiInPanel: "请先在新增卡片面板中配置 API",
-    generatingSpinner: "生成中...",
-    connecting: "正在连接...",
-    generatingWithCount: "生成中... ({count} 字)",
-    doneWithCount: "完成 ({count} 字)",
     stage1: "阶段 1：选题与调研",
     stage2: "阶段 2：Idea 构思",
     stage3: "阶段 3：方法设计",
@@ -117,30 +96,22 @@ const UI_STRINGS = {
     outputLangLabel: "输出",
   },
   en: {
-    siteTitle: "ScholarCanvas",
-    cardManagement: "Card Management",
+    siteTitle: "Cardz",
+    cardManagement: "Cardz",
     clearUsage: "Reset Usage",
-    apiConfig: "API Config",
     switchLang: "Switch Language",
     promptZh: "Prompt ZH",
     promptEn: "EN",
     outputZh: "Output ZH",
     outputEn: "EN",
     addCard: "Add Card",
-    metaTemplate: "Meta Template",
+    metaTemplate: "Create Skill",
     needLabel: "Requirement",
     metaPlaceholder: "e.g.: Compress a paper Introduction into a top-conference style Abstract, within 300 words.",
     copyInput: "Copy Input",
-    aiGenerate: "AI Generate",
     promptPlaceholder: "Paste AI response: first line is title, rest is the full skills template.",
     createCard: "Create Card",
     cancel: "Cancel",
-    apiConfigTitle: "API Configuration",
-    vendor: "Vendor",
-    apiUrl: "API URL",
-    model: "Model",
-    saveSettings: "Save Settings",
-    close: "Close",
     back: "Back",
     editCard: "Edit Card",
     deleteCard: "Delete Card",
@@ -164,25 +135,17 @@ const UI_STRINGS = {
     emptyBench: "No cards in bench",
     emptyCards: "No cards",
     emptyTrash: "Empty Trash",
-    pleaseConfigApi: "Please configure API Key in the top-right API Config first",
     pleaseFillInput: "Please fill in the input area first",
-    cancelled: "Cancelled",
-    genFailed: "Generation failed: ",
     copiedSuccess: "Copied",
     pleaseFillNeed: "Please fill in the requirement",
     copiedMeta: "Meta template + requirement copied",
     copyFailedManual: "Copy failed, please copy manually",
     pleasePasteFull: "Please paste complete content: first line is title, followed by skills template",
-    connectingAi: "Connecting to AI...",
-    saved: "Saved",
     load: "Load",
     delete: "Delete",
     pleaseEnterName: "Please enter a name",
     invalidFormat: "Invalid file format",
     fileParseFailed: "File parsing failed",
-    generating: "Generating",
-    failed: "Failed: ",
-    done: "Done",
     selectLocalFile: "Select local skills.md",
     inputPlaceholder: "Input: paste content to process here...",
     outputPlaceholder: "AI output...",
@@ -201,11 +164,6 @@ const UI_STRINGS = {
     trashWithCount: "Trash ({count})",
     empty: "Empty",
     noCardsInStage: "No cards",
-    configApiInPanel: "Please configure API in the Add Card panel first",
-    generatingSpinner: "Generating...",
-    connecting: "Connecting...",
-    generatingWithCount: "Generating... ({count} chars)",
-    doneWithCount: "Done ({count} chars)",
     stage1: "Stage 1: Topic Selection & Research",
     stage2: "Stage 2: Idea Conception",
     stage3: "Stage 3: Method Design",
@@ -505,17 +463,6 @@ const addPromptInput = document.getElementById("addPromptInput");
 const createCardBtn = document.getElementById("createCardBtn");
 const cancelAddBtn = document.getElementById("cancelAddBtn");
 const addStatusText = document.getElementById("addStatusText");
-const apiProviderSelect = document.getElementById("apiProviderSelect");
-const apiEndpointInput = document.getElementById("apiEndpointInput");
-const apiKeyInput = document.getElementById("apiKeyInput");
-const apiModelInput = document.getElementById("apiModelInput");
-const apiSaveBtn = document.getElementById("apiSaveBtn");
-const apiStatusText = document.getElementById("apiStatusText");
-const aiGenerateBtn = document.getElementById("aiGenerateBtn");
-const apiConfigModal = document.getElementById("apiConfigModal");
-const apiConfigMask = document.getElementById("apiConfigMask");
-const apiConfigBtn = document.getElementById("apiConfigBtn");
-const apiConfigCloseBtn = document.getElementById("apiConfigCloseBtn");
 const notice = document.getElementById("notice");
 const noticeText = document.getElementById("noticeText");
 const manualFile = document.getElementById("manualFile");
@@ -528,52 +475,9 @@ let state = createDefaultState();
 let pendingStageId = "";
 let layout1Rendered = false;
 
-const API_CONFIG_KEY = "prompt-card-api-config";
-const API_PROVIDERS = {
-  deepseek: { name: "DeepSeek", endpoint: "https://api.deepseek.com/v1/chat/completions", model: "deepseek-chat", format: "openai" },
-  openai: { name: "OpenAI", endpoint: "https://api.openai.com/v1/chat/completions", model: "gpt-4o-mini", format: "openai" },
-  zhipu: { name: "智谱 (GLM)", endpoint: "https://open.bigmodel.cn/api/paas/v4/chat/completions", model: "glm-4-flash", format: "openai" },
-  moonshot: { name: "Moonshot (Kimi)", endpoint: "https://api.moonshot.cn/v1/chat/completions", model: "moonshot-v1-8k", format: "openai" },
-  mimo: { name: "小米 MIMO", endpoint: "https://token-plan-cn.xiaomimimo.com/anthropic/v1/messages", model: "mimo-v2.5-pro", format: "anthropic" },
-  anthropic: { name: "Anthropic (Claude)", endpoint: "https://api.anthropic.com/v1/messages", model: "claude-sonnet-4-20250514", format: "anthropic" },
-  custom: { name: "自定义 (OpenAI)", endpoint: "", model: "", format: "openai" },
-  "custom-anthropic": { name: "自定义 (Anthropic)", endpoint: "", model: "", format: "anthropic" },
-};
-
-function loadApiConfig() {
-  try {
-    const raw = localStorage.getItem(API_CONFIG_KEY);
-    if (!raw) return { provider: "deepseek", endpoint: "", apiKey: "", model: "" };
-    const cfg = JSON.parse(raw);
-    return {
-      provider: cfg.provider || "deepseek",
-      endpoint: cfg.endpoint || "",
-      apiKey: cfg.apiKey || "",
-      model: cfg.model || "",
-    };
-  } catch (_) {
-    return { provider: "deepseek", endpoint: "", apiKey: "", model: "" };
-  }
-}
-
-function saveApiConfig(cfg) {
-  try { localStorage.setItem(API_CONFIG_KEY, JSON.stringify(cfg)); } catch (_) {}
-}
-
-function getApiConfig() {
-  const cfg = loadApiConfig();
-  const prov = API_PROVIDERS[cfg.provider] || API_PROVIDERS.deepseek;
-  return {
-    endpoint: cfg.endpoint || prov.endpoint,
-    apiKey: cfg.apiKey,
-    model: cfg.model || prov.model,
-    format: prov.format || "openai",
-  };
-}
-
 init();
 bindAddCardPanel();
-bindApiConfig();
+bindLangControls();
 bindFloatingActions();
 
 function bindFloatingActions() {
@@ -596,6 +500,44 @@ function bindFloatingActions() {
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
   }
+}
+
+function updateUiLang(newLang) {
+  uiLang = newLang;
+  localStorage.setItem("ui-lang", uiLang);
+  applyStaticI18n();
+
+  const uiLangText = document.getElementById("uiLangText");
+  if (uiLangText) uiLangText.textContent = uiLang === "zh" ? "中" : "EN";
+
+  const skillLangWrap = document.getElementById("skillLangWrap");
+
+  if (uiLang === "en") {
+    if (skillLangWrap) skillLangWrap.classList.add("hidden");
+    updateSkillLang("en");
+  } else {
+    if (skillLangWrap) skillLangWrap.classList.remove("hidden");
+    const savedSkillLang = localStorage.getItem("skill-lang") || "zh";
+    updateSkillLang(savedSkillLang);
+  }
+
+  if (layout1El && !layout1El.classList.contains("hidden")) {
+    layout1Rendered = false;
+    render();
+  }
+}
+
+function updateSkillLang(newLang) {
+  currentPromptLang = newLang;
+  localStorage.setItem("prompt-lang", currentPromptLang);
+  localStorage.setItem("skill-lang", currentPromptLang);
+
+  document.querySelectorAll("#skillLangWrap .segment-btn").forEach((b) => {
+    b.classList.toggle("active", b.dataset.lang === currentPromptLang);
+  });
+
+  refreshAllItems();
+  render();
 }
 
 async function init() {
@@ -672,17 +614,18 @@ function buildCardBank(zhItems, enItems) {
 function getCardFromBank(id) {
   const entry = cardBank[id];
   if (!entry) return null;
-  const data = entry[currentPromptLang] || entry.zh || entry.en;
-  if (!data) return null;
+  const skillData = entry[currentPromptLang] || entry.zh || entry.en;
+  const uiData = entry[uiLang] || entry.zh || entry.en;
+  if (!skillData) return null;
 
   const patch = state.editedCards[id];
   return {
     id,
     stageNum: String(id).split("-")[0],
-    title: patch && typeof patch.title === "string" ? patch.title : data.title,
-    category: data.category || t("uncategorized"),
-    prompt: patch && typeof patch.prompt === "string" ? patch.prompt : data.prompt,
-    hint: data.hint || "",
+    title: patch && typeof patch.title === "string" ? patch.title : skillData.title,
+    category: skillData.category || t("uncategorized"),
+    prompt: patch && typeof patch.prompt === "string" ? patch.prompt : skillData.prompt,
+    hint: uiData.hint || "",
     source: "base",
   };
 }
@@ -1280,7 +1223,6 @@ function bindAddCardPanel() {
     !metaStatusText ||
     !addPromptInput ||
     !createCardBtn ||
-    !cancelAddBtn ||
     !addStatusText
   ) {
     return;
@@ -1295,10 +1237,6 @@ function bindAddCardPanel() {
   }
 
   addModalMask.addEventListener("click", () => {
-    closeAddPanel();
-  });
-
-  cancelAddBtn.addEventListener("click", () => {
     closeAddPanel();
   });
 
@@ -1332,12 +1270,6 @@ function bindAddCardPanel() {
     closeAddPanel();
   });
 
-  // AI generate button
-  if (aiGenerateBtn) {
-    aiGenerateBtn.addEventListener("click", () => {
-      handleAiGenerate();
-    });
-  }
 }
 
 function closeAddPanel() {
@@ -1351,275 +1283,42 @@ function closeAddPanel() {
   addPromptInput.value = "";
   addStatusText.textContent = "";
   addStatusText.className = "add-status";
-  if (aiAbortController) { aiAbortController.abort(); aiAbortController = null; }
-  if (aiGenerateBtn) { aiGenerateBtn.textContent = t("aiGenerate"); aiGenerateBtn.disabled = false; }
 }
 
-let aiAbortController = null;
+function bindLangControls() {
+  // Language controls
+  const uiLangBtn = document.getElementById("uiLangBtn");
+  const skillLangWrap = document.getElementById("skillLangWrap");
 
-function buildApiRequest(cfg, systemMsg, userMsg) {
-  const isAnthropic = cfg.format === "anthropic";
-  const headers = { "Content-Type": "application/json" };
-  if (isAnthropic) {
-    headers["x-api-key"] = cfg.apiKey;
-    headers["anthropic-version"] = "2023-06-01";
-  } else {
-    headers["Authorization"] = `Bearer ${cfg.apiKey}`;
-  }
-  const body = isAnthropic
-    ? { model: cfg.model, max_tokens: 8192, system: systemMsg, messages: [{ role: "user", content: userMsg }], stream: true }
-    : { model: cfg.model, messages: [{ role: "system", content: systemMsg }, { role: "user", content: userMsg }], stream: true };
-  return { headers, body };
-}
-
-function parseStreamChunk(format, line) {
-  // Returns extracted text or null
-  const trimmed = line.trim();
-  if (!trimmed || !trimmed.startsWith("data:")) return null;
-  const data = trimmed.slice(5).trim();
-  if (data === "[DONE]") return null;
-  try {
-    const json = JSON.parse(data);
-    if (format === "anthropic") {
-      // Anthropic SSE: event: content_block_delta, data: {"delta":{"text":"..."}}
-      if (json.type === "content_block_delta" && json.delta && json.delta.text) return json.delta.text;
-    } else {
-      // OpenAI SSE: data: {"choices":[{"delta":{"content":"..."}}]}
-      const delta = json.choices && json.choices[0] && json.choices[0].delta;
-      if (delta && delta.content) return delta.content;
-    }
-  } catch (_) {}
-  return null;
-}
-
-async function streamApiResponse(resp, format, onText) {
-  const reader = resp.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = "";
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    buffer += decoder.decode(value, { stream: true });
-    const lines = buffer.split("\n");
-    buffer = lines.pop();
-    for (const line of lines) {
-      const text = parseStreamChunk(format, line);
-      if (text) onText(text);
-    }
-  }
-}
-
-async function callApi(cfg, systemMsg, userMsg, onText, signal) {
-  const { headers, body } = buildApiRequest(cfg, systemMsg, userMsg);
-  const abortSignal = signal || (aiAbortController ? aiAbortController.signal : undefined);
-  const resp = await fetch(cfg.endpoint, {
-    method: "POST",
-    headers,
-    body: JSON.stringify(body),
-    signal: abortSignal,
-  });
-  if (!resp.ok) {
-    const errText = await resp.text().catch(() => "");
-    throw new Error(`API ${resp.status}: ${errText.slice(0, 300)}`);
-  }
-  await streamApiResponse(resp, cfg.format, onText);
-}
-
-async function handleAiGenerate() {
-  const need = metaNeedInput.value.trim();
-  if (!need) {
-    addStatusText.textContent = t("pleaseFillNeed");
-    addStatusText.className = "add-status error";
-    metaNeedInput.focus();
-    return;
-  }
-
-  const cfg = getApiConfig();
-  if (!cfg.apiKey) {
-    addStatusText.textContent = t("pleaseConfigApi");
-    addStatusText.className = "add-status error";
-    return;
-  }
-
-  const systemMsg = "你是一位世界顶级的 AI 提示词工程师。根据用户的需求，生成高质量的 skills 模板。第一行输出中文短标题（4-5字），从第二行开始输出完整模板正文。";
-  const userMsg = META_TEMPLATE_TEXT.replace(META_INPUT_PLACEHOLDER, need);
-
-  if (aiAbortController) aiAbortController.abort();
-  aiAbortController = new AbortController();
-
-  aiGenerateBtn.innerHTML = '<span class="spinner"></span>生成中...';
-  aiGenerateBtn.disabled = true;
-  addPromptInput.value = "";
-  addStatusText.textContent = t("connectingAi");
-  addStatusText.className = "add-status";
-
-  try {
-    let fullText = "";
-    let charCount = 0;
-    await callApi(cfg, systemMsg, userMsg, (text) => {
-      fullText += text;
-      charCount += text.length;
-      addPromptInput.value = fullText;
-      addStatusText.textContent = `正在生成... (${charCount} 字)`;
-      addStatusText.className = "add-status";
-    });
-    addStatusText.textContent = `生成完成 (${charCount} 字)，请检查后点击「创建卡片」`;
-    addStatusText.className = "add-status success";
-  } catch (err) {
-    if (err.name === "AbortError") {
-      addStatusText.textContent = t("cancelled");
-      addStatusText.className = "add-status";
-    } else {
-      addStatusText.textContent = t("genFailed") + err.message;
-      addStatusText.className = "add-status error";
-    }
-  } finally {
-    aiGenerateBtn.textContent = t("aiGenerate");
-    aiGenerateBtn.disabled = false;
-    aiAbortController = null;
-  }
-}
-
-function bindApiConfig() {
-  if (!apiConfigModal) return;
-
-  const apiConfigBtn1 = document.getElementById("apiConfigBtn1");
-  const openApiConfig = () => {
-    apiConfigModal.classList.remove("hidden");
-    const cfg = loadApiConfig();
-    apiProviderSelect.value = cfg.provider;
-    apiKeyInput.value = cfg.apiKey;
-    apiModelInput.value = cfg.model;
-    const prov = API_PROVIDERS[cfg.provider];
-    apiEndpointInput.value = cfg.endpoint || (prov ? prov.endpoint : "");
-  };
-
-  if (apiConfigBtn) apiConfigBtn.addEventListener("click", openApiConfig);
-  if (apiConfigBtn1) apiConfigBtn1.addEventListener("click", openApiConfig);
-
-  if (apiConfigMask) {
-    apiConfigMask.addEventListener("click", () => {
-      apiConfigModal.classList.add("hidden");
+  if (uiLangBtn) {
+    uiLangBtn.addEventListener("click", () => {
+      updateUiLang(uiLang === "zh" ? "en" : "zh");
     });
   }
 
-  if (apiConfigCloseBtn) {
-    apiConfigCloseBtn.addEventListener("click", () => {
-      apiConfigModal.classList.add("hidden");
-    });
-  }
-
-  if (apiProviderSelect) {
-    apiProviderSelect.addEventListener("change", () => {
-      const defaults = API_PROVIDERS[apiProviderSelect.value];
-      if (defaults) {
-        if (defaults.endpoint) apiEndpointInput.value = defaults.endpoint;
-        apiModelInput.placeholder = defaults.model || "";
-      }
-    });
-  }
-
-  if (apiSaveBtn) {
-    apiSaveBtn.addEventListener("click", () => {
-      saveApiConfig({
-        provider: apiProviderSelect.value,
-        endpoint: apiEndpointInput.value.trim(),
-        apiKey: apiKeyInput.value.trim(),
-        model: apiModelInput.value.trim(),
+  if (skillLangWrap) {
+    skillLangWrap.querySelectorAll(".segment-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        updateSkillLang(btn.dataset.lang);
       });
-      apiStatusText.textContent = t("saved");
-      apiStatusText.className = "meta-status success";
-      setTimeout(() => { apiStatusText.textContent = ""; }, 2000);
     });
   }
 
-  // Language dropdown
-  const langDropdownWrap = document.getElementById("langDropdownWrap");
-  const langDropdown = document.getElementById("langDropdown");
-  const langDropdownWrap1 = document.getElementById("langDropdownWrap1");
-  const langDropdown1 = document.getElementById("langDropdown1");
-
-  function toggleLangDropdown(dropdown) {
-    if (!dropdown) return;
-    const isHidden = dropdown.classList.contains("hidden");
-    // Close all dropdowns first
-    document.querySelectorAll(".topbar-dropdown").forEach((d) => d.classList.add("hidden"));
-    if (isHidden) dropdown.classList.remove("hidden");
-  }
-
-  if (langDropdownWrap) {
-    langDropdownWrap.querySelector("#uiLangBtn").addEventListener("click", (e) => {
-      e.stopPropagation();
-      toggleLangDropdown(langDropdown);
-    });
-  }
-  if (langDropdownWrap1) {
-    langDropdownWrap1.querySelector("#uiLangBtn1").addEventListener("click", (e) => {
-      e.stopPropagation();
-      toggleLangDropdown(langDropdown1);
-    });
-  }
-
-  // Close dropdowns when clicking outside
-  document.addEventListener("click", () => {
-    document.querySelectorAll(".topbar-dropdown").forEach((d) => d.classList.add("hidden"));
-  });
-
-  // Prevent dropdown content clicks from closing the dropdown
-  document.querySelectorAll(".lang-dropdown").forEach((dropdown) => {
-    dropdown.addEventListener("click", (e) => {
-      e.stopPropagation();
-    });
-  });
-
-  // UI Language toggle
-  function updateUiLang(newLang) {
-    uiLang = newLang;
-    localStorage.setItem("ui-lang", uiLang);
-    // Re-render card management layout if visible
-    if (layout1El && !layout1El.classList.contains("hidden")) {
-      layout1Rendered = false;
-      render();
-    }
-    applyStaticI18n();
-    // Sync both toggles
-    document.querySelectorAll("#uiLangToggle .lang-toggle-btn, #uiLangToggle1 .lang-toggle-btn").forEach((b) => {
-      b.classList.toggle("active", b.dataset.lang === newLang);
-    });
-  }
-
-  document.querySelectorAll("#uiLangToggle .lang-toggle-btn, #uiLangToggle1 .lang-toggle-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      updateUiLang(btn.dataset.lang);
-    });
-  });
-
-  // Prompt Language toggle
-  function updatePromptLang(newLang) {
-    currentPromptLang = newLang;
-    localStorage.setItem("prompt-lang", currentPromptLang);
-    document.querySelectorAll("#promptLangToggle1 .lang-toggle-btn").forEach((b) => {
-      b.classList.toggle("active", b.dataset.lang === newLang);
-    });
-    refreshAllItems();
-    render();
-  }
-
-  document.querySelectorAll("#promptLangToggle .lang-toggle-btn, #promptLangToggle1 .lang-toggle-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      updatePromptLang(btn.dataset.lang);
-    });
-  });
-
-  // Apply saved UI language on load
+  // Initialize button states
   const savedLang = localStorage.getItem("ui-lang") || "zh";
-  if (savedLang === "en") updateUiLang("en");
-  else applyStaticI18n();
-
-  // Apply saved prompt language toggle state
-  document.querySelectorAll("#promptLangToggle1 .lang-toggle-btn").forEach((b) => {
-    b.classList.toggle("active", b.dataset.lang === currentPromptLang);
-  });
+  if (savedLang === "en") {
+    updateUiLang("en");
+  } else {
+    applyStaticI18n();
+    const uiLangText = document.getElementById("uiLangText");
+    if (uiLangText) uiLangText.textContent = "中";
+    if (skillLangWrap) {
+      skillLangWrap.querySelectorAll(".segment-btn").forEach((b) => {
+        b.classList.toggle("active", b.dataset.lang === (currentPromptLang === "en" ? "en" : "zh"));
+      });
+      skillLangWrap.classList.remove("hidden");
+    }
+  }
 }
 
 
@@ -1708,7 +1407,7 @@ function bindDragEvents(node, cardId) {
 }
 
 function clearDragState() {
-  commonRoot.querySelectorAll(".card.drag-over").forEach((node) => {
+  document.querySelectorAll(".card.drag-over").forEach((node) => {
     node.classList.remove("drag-over");
   });
 }

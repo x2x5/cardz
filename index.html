@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ScholarCanvas 学术画布</title>
+    <title>卡子</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -11,31 +11,22 @@
     <div class="bg-layer bg-layer-b" aria-hidden="true"></div>
     <div id="layout1" class="layout1">
       <header class="layout1-topbar">
-        <span class="layout1-title" data-i18n="cardManagement">卡片管理</span>
+        <span class="layout1-title" data-i18n="cardManagement">卡子</span>
         <div class="topbar-spacer"></div>
         <button id="resetUsageBtn" class="topbar-icon-btn" type="button" data-i18n-tooltip="clearUsage" data-tooltip="清空次数">
           <svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
         </button>
-        <div class="topbar-dropdown-wrap" id="langDropdownWrap1">
-          <button id="uiLangBtn1" class="topbar-icon-btn ui-lang-btn" type="button" data-i18n-tooltip="switchLang" data-tooltip="切换语言">
-            <svg viewBox="0 0 24 24"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>
-          </button>
-          <div id="langDropdown1" class="topbar-dropdown lang-dropdown hidden">
-            <div class="lang-dropdown-section">
-              <span class="lang-dropdown-label" data-i18n="uiLangLabel">界面语言</span>
-              <div class="lang-toggle" id="uiLangToggle1">
-                <button class="lang-toggle-btn active" data-lang="zh" type="button">中</button>
-                <button class="lang-toggle-btn" data-lang="en" type="button">EN</button>
-              </div>
-            </div>
-            <div class="lang-dropdown-section">
-              <span class="lang-dropdown-label" data-i18n="promptLangLabel">提示词</span>
-              <div class="lang-toggle" id="promptLangToggle1">
-                <button class="lang-toggle-btn active" data-lang="zh" type="button">中</button>
-                <button class="lang-toggle-btn" data-lang="en" type="button">EN</button>
-              </div>
+        <div class="topbar-lang-controls" id="langControls">
+          <div class="lang-segment" id="skillLangWrap" data-tooltip="切换技能语言">
+            <span class="lang-segment-label">技能</span>
+            <div class="lang-segment-pill">
+              <button class="segment-btn active" data-lang="zh" type="button">中</button>
+              <button class="segment-btn" data-lang="en" type="button">EN</button>
             </div>
           </div>
+          <button id="uiLangBtn" class="topbar-lang-btn ui-lang-btn" type="button" data-tooltip="切换界面语言">
+            <span class="lang-btn-text" id="uiLangText">中</span>
+          </button>
         </div>
       </header>
 
@@ -62,7 +53,7 @@
         <h3 id="addModalTitle" data-i18n="addCard">新增卡片</h3>
         <details class="meta-template-panel">
           <summary>
-            <span data-i18n="metaTemplate">元模板</span>
+            <span data-i18n="metaTemplate">创建技能</span>
             <span id="metaStatusText" class="meta-status"></span>
           </summary>
           <textarea id="metaTemplateInput" readonly></textarea>
@@ -73,7 +64,6 @@
         </label>
         <div class="add-form-actions">
           <button id="copyMetaBtn" class="create-btn" type="button" data-i18n="copyInput">复制输入</button>
-          <button id="aiGenerateBtn" class="create-btn ai-btn" type="button" data-i18n="aiGenerate">AI 生成</button>
         </div>
         <label>
           Skills
@@ -81,49 +71,8 @@
         </label>
         <div class="add-form-actions">
           <button id="createCardBtn" class="create-btn" type="button" data-i18n="createCard">创建卡片</button>
-          <button id="cancelAddBtn" type="button" data-i18n="cancel">取消</button>
         </div>
         <p id="addStatusText" class="add-status"></p>
-      </section>
-    </div>
-
-    <!-- API Config Modal -->
-    <div id="apiConfigModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="apiConfigTitle">
-      <div id="apiConfigMask" class="modal-mask"></div>
-      <section class="modal-panel">
-        <h3 id="apiConfigTitle" data-i18n="apiConfigTitle">API 配置</h3>
-        <div class="api-settings-body">
-          <label>
-            <span data-i18n="vendor">供应商</span>
-            <select id="apiProviderSelect">
-              <option value="deepseek">DeepSeek</option>
-              <option value="openai">OpenAI</option>
-              <option value="zhipu">Zhipu (GLM)</option>
-              <option value="moonshot">Moonshot (Kimi)</option>
-              <option value="mimo">Xiaomi MIMO</option>
-              <option value="anthropic">Anthropic (Claude)</option>
-              <option value="custom">Custom (OpenAI)</option>
-              <option value="custom-anthropic">Custom (Anthropic)</option>
-            </select>
-          </label>
-          <label>
-            <span data-i18n="apiUrl">API 地址</span>
-            <input id="apiEndpointInput" type="text" placeholder="https://api.example.com/v1/chat/completions" />
-          </label>
-          <label>
-            API Key
-            <input id="apiKeyInput" type="password" placeholder="sk-..." />
-          </label>
-          <label>
-            <span data-i18n="model">模型</span>
-            <input id="apiModelInput" type="text" placeholder="deepseek-chat" />
-          </label>
-          <button id="apiSaveBtn" type="button" data-i18n="saveSettings">保存设置</button>
-          <span id="apiStatusText" class="meta-status"></span>
-        </div>
-        <div class="add-form-actions">
-          <button id="apiConfigCloseBtn" type="button" data-i18n="close">关闭</button>
-        </div>
       </section>
     </div>
 
