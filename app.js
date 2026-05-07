@@ -1,7 +1,7 @@
 "use strict";
 
 // 每次推送到 GitHub 前手动更新此时间戳
-const BUILD_TIME = "2026-05-08T02:21:59+08:00";
+const BUILD_TIME = "2026-05-08T02:40:19+08:00";
 
 const STORAGE_KEY = "prompt-card-layout-v3";
 const PRIMARY_DATA_SOURCE_ZH = "./skills.md";
