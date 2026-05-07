@@ -13,9 +13,6 @@
       <header class="layout1-topbar">
         <span class="layout1-title" data-i18n="cardManagement">卡子</span>
         <div class="topbar-spacer"></div>
-        <button id="resetUsageBtn" class="topbar-icon-btn" type="button" data-i18n-tooltip="clearUsage" data-tooltip="清空次数">
-          <svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
-        </button>
         <div class="topbar-lang-controls" id="langControls">
           <div class="lang-segment" id="skillLangWrap" data-tooltip="切换技能语言">
             <span class="lang-segment-label">技能</span>
@@ -24,9 +21,25 @@
               <button class="segment-btn" data-lang="en" type="button">EN</button>
             </div>
           </div>
-          <button id="uiLangBtn" class="topbar-lang-btn ui-lang-btn" type="button" data-tooltip="切换界面语言">
-            <span class="lang-btn-text" id="uiLangText">中</span>
+        </div>
+        <div class="topbar-settings">
+          <button id="settingsBtn" class="topbar-icon-btn" type="button">
+            <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 0 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.58 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1 1 15.6 12 3.6 3.6 0 0 1 12 15.6z"/></svg>
           </button>
+          <div id="settingsMenu" class="settings-menu hidden">
+            <button id="uiLangMenuBtn" class="settings-item" type="button">
+              <svg viewBox="0 0 24 24" width="16" height="16"><path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>
+              <span id="uiLangMenuText">切换语言</span>
+            </button>
+            <button id="resetUsageMenuBtn" class="settings-item" type="button">
+              <svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+              <span data-i18n="clearUsage">清理次数</span>
+            </button>
+            <button id="clearCacheMenuBtn" class="settings-item" type="button">
+              <svg viewBox="0 0 24 24" width="16" height="16"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+              <span data-i18n="clearCache">清除缓存</span>
+            </button>
+          </div>
         </div>
       </header>
 
@@ -37,7 +50,13 @@
           <input id="manualFile" type="file" accept=".md,text/markdown" class="hidden" />
         </section>
 
+        <div id="favoritesRoot" class="stages-container"></div>
+
+        <div class="section-divider"><span data-i18n="builtinCards">系统自带卡片</span></div>
+
         <div id="stagesRoot" class="stages-container"></div>
+
+        <div class="section-divider"><span data-i18n="customCards">用户自定义卡片</span></div>
 
         <div id="customStagesRoot" class="stages-container"></div>
 
@@ -84,9 +103,9 @@
       <article class="card">
         <header class="card-head">
           <div class="card-head-top">
+            <span class="card-usage"></span>
             <h2 class="card-title"></h2>
-            <span class="card-usage cnode-usage"></span>
-            <div class="card-icon-actions"></div>
+            <button class="fav-btn" type="button" aria-label="收藏">☆</button>
           </div>
         </header>
         <textarea class="card-input cnode-textarea"></textarea>

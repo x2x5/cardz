@@ -13,7 +13,8 @@ const UI_STRINGS = {
   zh: {
     siteTitle: "卡子",
     cardManagement: "卡子",
-    clearUsage: "清空次数",
+    clearUsage: "清理次数",
+    clearCache: "清除缓存",
     switchLang: "切换语言",
     promptZh: "提示词 中",
     promptEn: "EN",
@@ -67,7 +68,12 @@ const UI_STRINGS = {
     subtitlePlaceholder: "点击添加备注…",
     subtitleInputPlaceholder: "输入备注…",
     uncategorized: "未分类",
-    myToolbox: "我的工具箱",
+    userCustomStage: "用户自定义阶段",
+    favorites: "收藏",
+    emptyFavorites: "暂无收藏卡片",
+    builtinCards: "系统自带卡片",
+    customCards: "用户自定义卡片",
+    switchLang: "切换语言",
     noticeSkillsFallback: "当前未读取到 {source}，已回退到 README.md。建议把数据迁移到 skills.md。",
     noticeNoSkills: "浏览器没有直接读取到 {source}。你可以点击下面按钮手动选择本地 skills.md 文件。",
     noticeNoTemplates: "没有解析到可用模板，请检查 skills.md 的 Part I 和代码块格式。",
@@ -99,6 +105,7 @@ const UI_STRINGS = {
     siteTitle: "Cardz",
     cardManagement: "Cardz",
     clearUsage: "Reset Usage",
+    clearCache: "Clear Cache",
     switchLang: "Switch Language",
     promptZh: "Prompt ZH",
     promptEn: "EN",
@@ -152,7 +159,12 @@ const UI_STRINGS = {
     subtitlePlaceholder: "Click to add note...",
     subtitleInputPlaceholder: "Enter note...",
     uncategorized: "Uncategorized",
-    myToolbox: "My Toolbox",
+    userCustomStage: "User Custom Stage",
+    favorites: "Favorites",
+    emptyFavorites: "No favorite cards",
+    builtinCards: "Built-in Cards",
+    customCards: "Custom Cards",
+    switchLang: "Switch Language",
     noticeSkillsFallback: "Could not load {source}, fell back to README.md. Consider migrating data to skills.md.",
     noticeNoSkills: "Browser could not load {source}. Click the button below to manually select a local skills.md file.",
     noticeNoTemplates: "No usable templates found. Check skills.md Part I and code block format.",
@@ -348,14 +360,13 @@ const customStagesRoot = document.getElementById("customStagesRoot");
 const addStageBtn = document.getElementById("addStageBtn");
 const cardCount = document.getElementById("cardCount");
 const cardTemplate = document.getElementById("cardTemplate");
-const resetUsageBtn = document.getElementById("resetUsageBtn");
 
 const layout1El = document.getElementById("layout1");
 
-const DEFAULT_USER_CARDS = [
+const DEFAULT_USER_CARDS_ZH = [
   {
     title: "方法迁移评估",
-    category: "用户卡片",
+    category: "用户自定义阶段",
     hint: "粘贴源论文的方法描述（核心机制、关键公式、实验设置）和你的研究问题/目标场景",
     prompt: `# Role
 你是一位经验丰富的跨领域研究顾问，擅长评估一个方法从源领域迁移到目标领域的可行性和适配方案。
@@ -389,74 +400,43 @@ const DEFAULT_USER_CARDS = [
 # Input
 [在此处粘贴源论文的方法描述（核心机制、关键公式、实验设置），以及你的研究问题和目标场景的简要描述]`,
   },
+];
+
+const DEFAULT_USER_CARDS_EN = [
   {
-    title: "实验日志记录",
-    category: "用户卡片",
-    hint: "粘贴本次实验的配置、结果数据，以及你想验证的目标",
+    title: "Paragraph-Level Language Review",
+    category: "User Custom Stage",
+    hint: "Paste the English paper paragraph you need polished",
     prompt: `# Role
-你是一位严谨的科研实验记录助手，擅长帮助研究者结构化地记录实验过程、结果和反思，确保实验可复现、思路可追溯。
+You are an academic paper editor renowned for linguistic precision, specializing in polishing services for non-native English authors, with a deep understanding of academic writing conventions in computer science.
 
 # Task
-根据我提供的【实验信息】，帮我生成一份结构化的实验日志条目，用于记录本次实验的完整信息。
+Polish the paper paragraph I provide, improving linguistic accuracy and professionalism while preserving the original meaning and author style.
 
 # Constraints
-1. 日志结构：
-   - 实验编号与日期：自动编号，标注日期。
-   - 实验目标：本次实验想验证什么？对应论文的哪个 claim？
-   - 实验配置：模型配置、超参数、数据集版本、随机种子等所有可复现信息。
-   - 实验结果：核心指标的具体数值，与上次实验的对比。
-   - 观察与分析：结果是否符合预期？如果不符合，可能的原因是什么？
-   - 下一步计划：基于本次结果，下一步要做什么？
-2. 记录规范：
-   - 所有数值必须具体，不要说"效果不错"，要说"准确率从 82.3% 提升到 85.1%"。
-   - 超参数必须完整记录，不要遗漏任何可能影响复现的设置。
-   - 如果有异常结果，必须详细记录当时的条件和可能的干扰因素。
-3. 对比分析：
-   - 如果我提供了历史实验数据，自动与最近的实验进行对比。
-   - 标注哪些指标有提升，哪些有下降，变化幅度是多少。
-4. 输出格式：
-   - Part 1 [实验日志]：按上述结构输出完整日志。
-   - Part 2 [关键发现]：用 1-2 句话总结本次实验最重要的发现。
-   - Part 3 [下一步行动]：具体的下一步实验计划。
-   - 除以上三部分外，不要输出多余的对话。
+1. Polishing principles:
+   - Minimal changes: only fix actual problems, do not "beautify rewrite" sentences that are already fluent.
+   - Preserve meaning: never change the author's intended meaning, even if the original sentence is not well written.
+   - Preserve style: do not change the author's narrative rhythm and personal style.
+   - Academic register: use formal academic English, avoid colloquial expressions.
+2. Modification types:
+   - Grammar fixes: subject-verb agreement, tense, articles, prepositions, etc.
+   - Word choice optimization: replace inaccurate or non-idiomatic words with more academic expressions.
+   - Sentence structure improvement: improve sentence structure for clearer logic and tighter expression.
+   - Connector optimization: improve logical transitions within and between paragraphs.
+3. Prohibitions:
+   - Do not add information not present in the original paragraph.
+   - Do not delete key information from the original paragraph.
+   - Do not replace words just to "sound more advanced", only when the original word is genuinely inaccurate.
+   - Do not change the paragraph's argumentative logic.
+4. Output format:
+   - Part 1 [Polished English]: the complete polished paragraph.
+   - Part 2 [Change List]: list changes item by item, format as "original → revised → reason".
+   - Part 3 [Chinese Translation]: literal Chinese translation of the polished paragraph for meaning verification.
+   - Do not output extra dialogue beyond the above three parts.
 
 # Input
-[在此处粘贴本次实验的配置、结果数据，以及你想验证的目标]`,
-  },
-  {
-    title: "论文段落润色",
-    category: "用户卡片",
-    hint: "粘贴你需要润色的英文论文段落",
-    prompt: `# Role
-你是一位以语言精准著称的学术论文编辑，专门为非母语英语作者提供论文润色服务，对计算机科学领域的学术写作惯例有深入理解。
-
-# Task
-对我提供的【论文段落】进行润色，在保持原意和作者风格的前提下，提升语言的精准度和专业度。
-
-# Constraints
-1. 润色原则：
-   - 最小修改：只改确实有问题的地方，不要对已经通顺的句子进行"美化式重写"。
-   - 保留原意：绝不改变作者要表达的意思，哪怕原句写得不够好。
-   - 保留风格：不要改变作者的叙述节奏和个人风格。
-   - 学术语体：使用正式学术英语，避免口语化表达。
-2. 修改类型：
-   - 语法修正：主谓一致、时态、冠词、介词等基础语法问题。
-   - 用词优化：替换不准确或不地道的用词，使用更学术的表达。
-   - 句式调整：改善句子结构，使逻辑更清晰、表达更紧凑。
-   - 连接词优化：改善段落内部和段落之间的逻辑衔接。
-3. 禁止事项：
-   - 不要添加原段落中没有的信息。
-   - 不要删除原段落中的关键信息。
-   - 不要为了"听起来更高级"而替换词汇，只有在原词确实不准确时才替换。
-   - 不要改变段落的论证逻辑。
-4. 输出格式：
-   - Part 1 [润色后英文]：润色后的完整段落。
-   - Part 2 [修改清单]：逐条列出修改内容，格式为"原文 → 修改后 → 修改理由"。
-   - Part 3 [中文对照]：润色后段落的中文直译，用于核对原意是否保留。
-   - 除以上三部分外，不要输出多余的对话。
-
-# Input
-[在此处粘贴你需要润色的英文论文段落]`,
+[Paste the English paper paragraph you need polished here]`,
   },
 ];
 const addModal = document.getElementById("addModal");
@@ -491,21 +471,54 @@ function bindFloatingActions() {
   const topBtn = document.getElementById("scrollTopBtn");
 
   if (toggleBtn) {
-    let collapsed = false;
     toggleBtn.addEventListener("click", () => {
-      collapsed = !collapsed;
-      toggleBtn.textContent = collapsed ? t("expand") : t("collapse");
-      document.querySelectorAll(".layout1 details.zone").forEach((det) => {
-        det.open = !collapsed;
+      const zones = document.querySelectorAll(".layout1 details.zone");
+      const allClosed = zones.length === 0 || Array.from(zones).every((z) => !z.open);
+      zones.forEach((det) => {
+        det.open = allClosed;
       });
+      updateCollapseButtonText();
     });
   }
 
   if (topBtn) {
     topBtn.addEventListener("click", () => {
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      const layout = document.querySelector(".layout1");
+      if (layout) {
+        layout.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
     });
   }
+}
+
+function areAllZonesOpen() {
+  const zones = document.querySelectorAll(".layout1 details.zone");
+  if (zones.length === 0) return true;
+  return Array.from(zones).every((z) => z.open);
+}
+
+function updateCollapseButtonText() {
+  const btn = document.getElementById("toggleCollapseBtn");
+  if (!btn) return;
+  const zones = document.querySelectorAll(".layout1 details.zone");
+  if (zones.length === 0) {
+    btn.textContent = t("collapse");
+    return;
+  }
+  const allClosed = Array.from(zones).every((z) => !z.open);
+  btn.textContent = allClosed ? t("expand") : t("collapse");
+}
+
+function bindZoneToggleListeners() {
+  document.querySelectorAll(".layout1 details.zone").forEach((zone) => {
+    if (zone._toggleBound) return;
+    zone._toggleBound = true;
+    zone.addEventListener("toggle", () => {
+      updateCollapseButtonText();
+    });
+  });
 }
 
 function updateUiLang(newLang) {
@@ -513,8 +526,8 @@ function updateUiLang(newLang) {
   localStorage.setItem("ui-lang", uiLang);
   applyStaticI18n();
 
-  const uiLangText = document.getElementById("uiLangText");
-  if (uiLangText) uiLangText.textContent = uiLang === "zh" ? "中" : "EN";
+  const uiLangMenuText = document.getElementById("uiLangMenuText");
+  if (uiLangMenuText) uiLangMenuText.textContent = t("switchLang");
 
   const skillLangWrap = document.getElementById("skillLangWrap");
 
@@ -628,8 +641,8 @@ function getCardFromBank(id) {
   return {
     id,
     stageNum: String(id).split("-")[0],
-    title: patch && typeof patch.title === "string" ? patch.title : skillData.title,
-    category: skillData.category || t("uncategorized"),
+    title: patch && typeof patch.title === "string" ? patch.title : uiData.title,
+    category: uiData.category || t("uncategorized"),
     prompt: patch && typeof patch.prompt === "string" ? patch.prompt : skillData.prompt,
     hint: uiData.hint || "",
     source: "base",
@@ -651,12 +664,6 @@ manualFile.addEventListener("change", async (event) => {
     render();
   }
 });
-
-if (resetUsageBtn) {
-  resetUsageBtn.addEventListener("click", () => {
-    resetAllUsageCount();
-  });
-}
 
 function parsePromptItems(markdown) {
   const partOne = extractPartOne(markdown);
@@ -837,20 +844,104 @@ function buildStableId(title, usedIds) {
 }
 
 
+function toggleFavorite(cardId) {
+  const favs = new Set(state.favoriteIds || []);
+  if (favs.has(cardId)) {
+    favs.delete(cardId);
+  } else {
+    favs.add(cardId);
+  }
+  state.favoriteIds = Array.from(favs);
+  saveState();
+  updateAllFavButtons();
+  renderFavorites();
+}
+
+function updateAllFavButtons() {
+  document.querySelectorAll(".card").forEach((node) => {
+    const cardId = node.dataset.cardId;
+    const favBtn = node.querySelector(".fav-btn");
+    if (!favBtn || !cardId) return;
+    const isFav = (state.favoriteIds || []).includes(cardId);
+    favBtn.textContent = isFav ? "★" : "☆";
+    favBtn.classList.toggle("favorited", isFav);
+  });
+}
+
+function renderFavorites() {
+  const favoritesRoot = document.getElementById("favoritesRoot");
+  if (!favoritesRoot) return;
+  favoritesRoot.innerHTML = "";
+
+  const favIds = state.favoriteIds || [];
+  const favItems = favIds
+    .map((id) => allItems.find((item) => item.id === id))
+    .filter(Boolean);
+
+  const details = document.createElement("details");
+  details.className = "zone favorites-zone";
+  details.dataset.zoneType = "favorites";
+  details.open = true;
+
+  const summary = document.createElement("summary");
+  const span = document.createElement("span");
+  span.textContent = t("favorites");
+  summary.appendChild(span);
+  details.appendChild(summary);
+
+  if (favItems.length === 0) {
+    const emptyTip = document.createElement("p");
+    emptyTip.className = "empty-tip";
+    emptyTip.textContent = t("emptyFavorites");
+    details.appendChild(emptyTip);
+  } else {
+    const grid = document.createElement("div");
+    grid.className = "cards";
+    favItems.forEach((item, index) => {
+      grid.appendChild(createCard(item, "favorites", index));
+    });
+    details.appendChild(grid);
+  }
+
+  favoritesRoot.appendChild(details);
+}
+
 function render(options = {}) {
   const suppressAnimation = Boolean(options.suppressAnimation);
+
+  // Remember collapse state before re-rendering
+  const openState = new Map();
+  document.querySelectorAll(".zone").forEach((zone) => {
+    if (zone.dataset.stageNum) openState.set("b:" + zone.dataset.stageNum, zone.open);
+    if (zone.dataset.stageId) openState.set("c:" + zone.dataset.stageId, zone.open);
+    if (zone.dataset.zoneType === "favorites") openState.set("fav", zone.open);
+  });
+
   if (suppressAnimation) {
     document.body.classList.add("no-enter-anim");
   }
 
+  renderFavorites();
   renderStages(allItems);
   renderCustomStages();
+
+  // Restore collapse state
+  document.querySelectorAll(".zone").forEach((zone) => {
+    let key = null;
+    if (zone.dataset.stageNum) key = "b:" + zone.dataset.stageNum;
+    else if (zone.dataset.stageId) key = "c:" + zone.dataset.stageId;
+    else if (zone.dataset.zoneType === "favorites") key = "fav";
+    if (key && openState.has(key)) zone.open = openState.get(key);
+  });
 
   if (suppressAnimation) {
     requestAnimationFrame(() => {
       document.body.classList.remove("no-enter-anim");
     });
   }
+
+  bindZoneToggleListeners();
+  updateCollapseButtonText();
 }
 
 function renderStages(stageItems) {
@@ -872,6 +963,7 @@ function renderStages(stageItems) {
 
     const details = document.createElement("details");
     details.className = "zone stage-zone";
+    details.dataset.stageNum = String(stageNum);
     details.open = true;
 
     const summary = document.createElement("summary");
@@ -910,10 +1002,12 @@ function renderStages(stageItems) {
 function renderCustomStages() {
   if (!customStagesRoot) return;
   customStagesRoot.innerHTML = "";
-  const sorted = [...state.customStages].sort((a, b) => a.order - b.order);
+  const sorted = [...state.customStages]
+    .filter((s) => !s.lang || s.lang === uiLang)
+    .sort((a, b) => a.order - b.order);
 
   sorted.forEach((stage) => {
-    const cards = state.customCards.filter((c) => c.stageId === stage.id);
+    const cards = allItems.filter((item) => item.source === "custom" && item.stageId === stage.id);
     const details = document.createElement("details");
     details.className = "zone stage-zone custom-stage-zone";
     details.open = true;
@@ -927,7 +1021,7 @@ function renderCustomStages() {
 
     const nameSpan = document.createElement("span");
     nameSpan.className = "stage-name-display";
-    const KNOWN_STAGE_NAMES = { "我的工具箱": "myToolbox" };
+    const KNOWN_STAGE_NAMES = { "用户自定义阶段": "userCustomStage" };
     nameSpan.textContent = KNOWN_STAGE_NAMES[stage.name] ? t(KNOWN_STAGE_NAMES[stage.name]) : stage.name;
 
     const editIcon = document.createElement("button");
@@ -1113,7 +1207,7 @@ function createCard(item, zone, index) {
   const saveEditBtn = node.querySelector(".save-edit-btn");
   const cancelEditBtn = node.querySelector(".cancel-edit-btn");
 
-  title.textContent = translateCardTitle(item.title);
+  title.textContent = item.title;
   input.placeholder = item.hint || t("inputPlaceholder");
   if (previewPre) previewPre.textContent = item.prompt;
 
@@ -1208,6 +1302,17 @@ function createCard(item, zone, index) {
 
   deleteBtn.addEventListener("click", () => { deleteCard(item.id); });
 
+  const favBtn = node.querySelector(".fav-btn");
+  if (favBtn) {
+    const isFav = (state.favoriteIds || []).includes(item.id);
+    favBtn.textContent = isFav ? "★" : "☆";
+    favBtn.classList.toggle("favorited", isFav);
+    favBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleFavorite(item.id);
+    });
+  }
+
   node.querySelectorAll("[data-i18n]").forEach((el) => {
     el.textContent = t(el.dataset.i18n);
   });
@@ -1292,12 +1397,14 @@ function closeAddPanel() {
 
 function bindLangControls() {
   // Language controls
-  const uiLangBtn = document.getElementById("uiLangBtn");
+  const uiLangMenuBtn = document.getElementById("uiLangMenuBtn");
   const skillLangWrap = document.getElementById("skillLangWrap");
+  const settingsMenu = document.getElementById("settingsMenu");
 
-  if (uiLangBtn) {
-    uiLangBtn.addEventListener("click", () => {
+  if (uiLangMenuBtn) {
+    uiLangMenuBtn.addEventListener("click", () => {
       updateUiLang(uiLang === "zh" ? "en" : "zh");
+      if (settingsMenu) settingsMenu.classList.add("hidden");
     });
   }
 
@@ -1315,8 +1422,8 @@ function bindLangControls() {
     updateUiLang("en");
   } else {
     applyStaticI18n();
-    const uiLangText = document.getElementById("uiLangText");
-    if (uiLangText) uiLangText.textContent = "中";
+    const uiLangMenuText = document.getElementById("uiLangMenuText");
+    if (uiLangMenuText) uiLangMenuText.textContent = t("switchLang");
     if (skillLangWrap) {
       skillLangWrap.querySelectorAll(".segment-btn").forEach((b) => {
         b.classList.toggle("active", b.dataset.lang === (currentPromptLang === "en" ? "en" : "zh"));
@@ -1479,7 +1586,7 @@ function addNewCard(title, prompt, hint) {
     stageId = pendingStageId;
   }
 
-  state.customCards.push({ id, title, category, prompt, stageId, stageNum, hint });
+  state.customCards.push({ id, title, category, prompt, stageId, stageNum, hint, lang: uiLang });
   pendingStageId = "";
   commitState();
 }
@@ -1594,6 +1701,7 @@ function refreshAllItems() {
   state.customCards.forEach((item) => {
     if (!item || !item.id || !item.title || !item.prompt) return;
     if (seen.has(item.id)) return;
+    if (item.lang && item.lang !== uiLang) return;
     seen.add(item.id);
     output.push({
       ...item,
@@ -1651,6 +1759,7 @@ function createDefaultState() {
     sortByUsage: false,
     editedCards: {},
     deletedCardIds: [],
+    favoriteIds: [],
     userCardsSeeded: false,
   };
 }
@@ -1671,24 +1780,40 @@ function seedDefaultUserCards() {
         ? state.customStages[0].id
         : (() => {
             const id = "stage-" + Math.random().toString(36).slice(2, 9);
-            state.customStages.push({ id, name: "我的工具箱", order: 0 });
+            state.customStages.push({ id, name: "想到灵感", order: 0, lang: "zh" });
             return id;
           })();
-      orphanCards.forEach((c) => { c.stageId = stageId; c.category = state.customStages.find(s => s.id === stageId)?.name || "我的工具箱"; });
+      orphanCards.forEach((c) => { c.stageId = stageId; c.category = state.customStages.find(s => s.id === stageId)?.name || "想到灵感"; });
       saveState();
     }
     return;
   }
-  const stageId = "stage-" + Math.random().toString(36).slice(2, 9);
-  state.customStages.push({ id: stageId, name: "我的工具箱", order: 0 });
-  DEFAULT_USER_CARDS.forEach((card) => {
+  const zhStageId = "stage-" + Math.random().toString(36).slice(2, 9);
+  const enStageId = "stage-" + Math.random().toString(36).slice(2, 9);
+  state.customStages.push({ id: zhStageId, name: "想到灵感", order: 0, lang: "zh" });
+  state.customStages.push({ id: enStageId, name: "Polish Language", order: 1, lang: "en" });
+  DEFAULT_USER_CARDS_ZH.forEach((card) => {
     const id = buildCustomCardId();
     state.customCards.push({
       id,
       title: card.title,
-      category: "我的工具箱",
+      category: "想到灵感",
       prompt: card.prompt,
-      stageId,
+      hint: card.hint,
+      stageId: zhStageId,
+      lang: "zh",
+    });
+  });
+  DEFAULT_USER_CARDS_EN.forEach((card) => {
+    const id = buildCustomCardId();
+    state.customCards.push({
+      id,
+      title: card.title,
+      category: "Polish Language",
+      prompt: card.prompt,
+      hint: card.hint,
+      stageId: enStageId,
+      lang: "en",
     });
   });
   state.userCardsSeeded = true;
@@ -1697,7 +1822,7 @@ function seedDefaultUserCards() {
 
 function addCustomStage(name) {
   const id = "stage-" + Math.random().toString(36).slice(2, 9);
-  state.customStages.push({ id, name: name || "新阶段", order: state.customStages.length });
+  state.customStages.push({ id, name: name || "新阶段", order: state.customStages.length, lang: uiLang });
   commitState();
   return id;
 }
@@ -1784,6 +1909,7 @@ function normalizeState(raw) {
         hint: card.hint ? String(card.hint).trim() : "",
         stageId: card.stageId ? String(card.stageId).trim() : "",
         stageNum: card.stageNum ? String(card.stageNum).trim() : "",
+        lang: card.lang || "",
       }))
       .filter((card) => card.id && card.title && card.prompt);
     // Preserve cards without stageId for migration in seedDefaultUserCards
@@ -1795,6 +1921,7 @@ function normalizeState(raw) {
         id: String(s.id || "").trim(),
         name: String(s.name || "").trim() || "自定义阶段",
         order: typeof s.order === "number" ? s.order : i,
+        lang: s.lang || "",
       }))
       .filter((s) => s.id && s.name);
   }
@@ -1806,6 +1933,7 @@ function normalizeState(raw) {
           id: String(t.stage.id || "").trim(),
           name: String(t.stage.name || "").trim() || "自定义阶段",
           order: typeof t.stage.order === "number" ? t.stage.order : 0,
+          lang: t.stage.lang || "",
         },
         cards: Array.isArray(t.cards) ? t.cards
           .filter((c) => c && typeof c === "object")
@@ -1851,6 +1979,9 @@ function normalizeState(raw) {
   }
   if (Array.isArray(raw.deletedCardIds)) {
     next.deletedCardIds = raw.deletedCardIds.filter((id) => typeof id === "string");
+  }
+  if (Array.isArray(raw.favoriteIds)) {
+    next.favoriteIds = raw.favoriteIds.filter((id) => typeof id === "string");
   }
 
   return next;
@@ -1939,4 +2070,39 @@ function showNotice(text) {
 function hideNotice() {
   notice.classList.add("hidden");
   manualLoadBtn.classList.add("hidden");
+}
+
+/* ── Settings Panel ── */
+const settingsBtn = document.getElementById("settingsBtn");
+const settingsMenu = document.getElementById("settingsMenu");
+const resetUsageMenuBtn = document.getElementById("resetUsageMenuBtn");
+const clearCacheMenuBtn = document.getElementById("clearCacheMenuBtn");
+
+if (settingsBtn && settingsMenu) {
+  settingsBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    settingsMenu.classList.toggle("hidden");
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!settingsMenu.contains(e.target) && e.target !== settingsBtn) {
+      settingsMenu.classList.add("hidden");
+    }
+  });
+}
+
+if (resetUsageMenuBtn) {
+  resetUsageMenuBtn.addEventListener("click", () => {
+    state.usageCountById = {};
+    saveState();
+    settingsMenu.classList.add("hidden");
+    render();
+  });
+}
+
+if (clearCacheMenuBtn) {
+  clearCacheMenuBtn.addEventListener("click", () => {
+    localStorage.clear();
+    location.reload();
+  });
 }
