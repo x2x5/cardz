@@ -1,10 +1,12 @@
 "use strict";
 
-const STORAGE_KEY = "prompt-card-layout-v2";
+const STORAGE_KEY = "prompt-card-layout-v3";
 const PRIMARY_DATA_SOURCE_ZH = "./skills.md";
 const PRIMARY_DATA_SOURCE_EN = "./skills-en.md";
 const FALLBACK_DATA_SOURCE = "./README.md";
 let currentPromptLang = "zh";
+let cardBank = {};
+let baseCardIds = [];
 
 // ── UI i18n ──
 const UI_STRINGS = {
@@ -519,23 +521,12 @@ const noticeText = document.getElementById("noticeText");
 const manualFile = document.getElementById("manualFile");
 const manualLoadBtn = document.querySelector(".manual-load-btn");
 
-let baseItems = [];
 let allItems = [];
 let draggingId = null;
 const inputStore = new Map();
 let state = createDefaultState();
 let pendingStageId = "";
 let layout1Rendered = false;
-
-const STAGE_ORDER = [
-  "阶段 1：选题与调研",
-  "阶段 2：Idea 构思",
-  "阶段 3：方法设计",
-  "阶段 4：实验执行",
-  "阶段 5：论文写作",
-  "阶段 6：审稿与修改",
-  "阶段 7：投稿与准备",
-];
 
 const API_CONFIG_KEY = "prompt-card-api-config";
 const API_PROVIDERS = {
@@ -612,89 +603,110 @@ async function init() {
   if (savedPromptLang === "en" || savedPromptLang === "zh") {
     currentPromptLang = savedPromptLang;
   }
-  const markdown = await tryReadDataSource();
-  if (!markdown) {
-    // No data source, still init cards
-    state = normalizeState(loadState());
-    refreshAllItems();
-    switchToLayout1();
-    return;
+
+  const [zhMarkdown, enMarkdown] = await Promise.all([
+    fetchSkills(PRIMARY_DATA_SOURCE_ZH),
+    fetchSkills(PRIMARY_DATA_SOURCE_EN),
+  ]);
+
+  const zhItems = zhMarkdown ? parsePromptItems(zhMarkdown) : [];
+  const enItems = enMarkdown ? parsePromptItems(enMarkdown) : [];
+
+  if (zhItems.length > 0 || enItems.length > 0) {
+    buildCardBank(zhItems, enItems);
+    hideNotice();
+  } else {
+    showNotice(t("noticeNoSkills").replace("{source}", PRIMARY_DATA_SOURCE_ZH));
+    manualLoadBtn.classList.remove("hidden");
   }
-  parseAndInit(markdown);
+
+  state = normalizeState(loadState());
+  try { seedDefaultUserCards(); } catch (e) { console.error("seed error:", e); }
+  refreshAllItems();
+  saveState();
+
+  if (allItems.length === 0) {
+    showNotice(t("noticeNoTemplates"));
+    manualLoadBtn.classList.remove("hidden");
+  }
+
   switchToLayout1();
 }
 
-function getDataSource() {
-  return currentPromptLang === "en" ? PRIMARY_DATA_SOURCE_EN : PRIMARY_DATA_SOURCE_ZH;
+async function fetchSkills(source) {
+  try {
+    const response = await fetch(source + "?t=" + Date.now(), { cache: "no-store" });
+    if (!response.ok) return null;
+    return await response.text();
+  } catch (error) {
+    return null;
+  }
 }
 
-async function tryReadDataSource() {
-  const source = getDataSource() + "?t=" + Date.now();
-  try {
-    const response = await fetch(source, { cache: "no-store" });
-    if (!response.ok) {
-      throw new Error("无法读取 " + source);
+function buildCardBank(zhItems, enItems) {
+  cardBank = {};
+  baseCardIds = [];
+
+  let stageNum = 0;
+  let cardInStage = 0;
+  let prevCategory = null;
+
+  zhItems.forEach((zhItem, i) => {
+    if (zhItem.category !== prevCategory) {
+      stageNum++;
+      cardInStage = 1;
+      prevCategory = zhItem.category;
+    } else {
+      cardInStage++;
     }
-    const text = await response.text();
-    hideNotice();
-    return text;
-  } catch (error) {
-    try {
-      const fallbackResponse = await fetch(FALLBACK_DATA_SOURCE + "?t=" + Date.now(), { cache: "no-store" });
-      if (!fallbackResponse.ok) {
-        throw new Error("无法读取 fallback README.md");
-      }
-      const fallbackText = await fallbackResponse.text();
-      showNotice(t("noticeSkillsFallback").replace("{source}", source));
-      return fallbackText;
-    } catch (fallbackError) {
-      showNotice(t("noticeNoSkills").replace("{source}", source));
-      manualLoadBtn.classList.remove("hidden");
-      return null;
-    }
-  }
+
+    const id = `${stageNum}-${cardInStage}`;
+    baseCardIds.push(id);
+    cardBank[id] = {
+      zh: zhItem,
+      en: enItems[i] || null,
+    };
+  });
+}
+
+function getCardFromBank(id) {
+  const entry = cardBank[id];
+  if (!entry) return null;
+  const data = entry[currentPromptLang] || entry.zh || entry.en;
+  if (!data) return null;
+
+  const patch = state.editedCards[id];
+  return {
+    id,
+    stageNum: String(id).split("-")[0],
+    title: patch && typeof patch.title === "string" ? patch.title : data.title,
+    category: data.category || t("uncategorized"),
+    prompt: patch && typeof patch.prompt === "string" ? patch.prompt : data.prompt,
+    hint: data.hint || "",
+    source: "base",
+  };
 }
 
 manualFile.addEventListener("change", async (event) => {
   const file = event.target.files && event.target.files[0];
   if (!file) return;
   const text = await file.text();
-  parseAndInit(text);
-  layout1Rendered = false;
-  render();
+  const items = parsePromptItems(text);
+  if (items.length > 0) {
+    buildCardBank(items, []);
+    state = normalizeState(loadState());
+    seedDefaultUserCards();
+    refreshAllItems();
+    saveState();
+    layout1Rendered = false;
+    render();
+  }
 });
 
 if (resetUsageBtn) {
   resetUsageBtn.addEventListener("click", () => {
     resetAllUsageCount();
   });
-}
-
-function parseAndInit(markdown) {
-  try {
-    hideNotice();
-
-    baseItems = parsePromptItems(markdown).map((item) => ({
-      ...item,
-      source: "base",
-    }));
-    state = normalizeState(loadState());
-    try { seedDefaultUserCards(); } catch (e) { console.error("seed error:", e); }
-    refreshAllItems();
-    saveState();
-
-    if (allItems.length === 0) {
-      showNotice(t("noticeNoTemplates"));
-      manualLoadBtn.classList.remove("hidden");
-    }
-  } catch (error) {
-    baseItems = [];
-    allItems = [];
-    state = createDefaultState();
-    render();
-    showNotice(t("noticeParseFailed"));
-    manualLoadBtn.classList.remove("hidden");
-  }
 }
 
 function parsePromptItems(markdown) {
@@ -894,62 +906,28 @@ function render(options = {}) {
 
 function renderStages(stageItems) {
   stagesRoot.innerHTML = "";
-  // Exclude items belonging to custom stages — they're rendered by renderCustomStages
-  const customStageNames = new Set(state.customStages.map((s) => s.name));
   const grouped = new Map();
+
   stageItems.forEach((item) => {
-    if (customStageNames.has(item.category)) return;
-    const cat = item.category || t("uncategorized");
-    if (!grouped.has(cat)) {
-      grouped.set(cat, []);
+    if (item.source !== "base") return;
+    const stageNum = item.stageNum || "0";
+    if (!grouped.has(stageNum)) {
+      grouped.set(stageNum, []);
     }
-    grouped.get(cat).push(item);
+    grouped.get(stageNum).push(item);
   });
 
-  // Stage name translation map (both zh and en source names -> i18n key)
-  const stageI18nMap = {
-    "阶段 1：选题与调研": "stage1",
-    "阶段 2：Idea 构思": "stage2",
-    "阶段 3：方法设计": "stage3",
-    "阶段 4：实验执行": "stage4",
-    "阶段 5：论文写作": "stage5",
-    "阶段 6：审稿与修改": "stage6",
-    "阶段 7：投稿与准备": "stage7",
-    "Stage 1: Topic Selection & Research": "stage1",
-    "Stage 2: Idea Conception": "stage2",
-    "Stage 3: Method Design": "stage3",
-    "Stage 4: Experiment Execution": "stage4",
-    "Stage 5: Paper Writing": "stage5",
-    "Stage 6: Review & Revision": "stage6",
-    "Stage 7: Submission & Preparation": "stage7",
-  };
+  for (let stageNum = 1; stageNum <= 7; stageNum++) {
+    const items = grouped.get(String(stageNum));
+    if (!items || items.length === 0) continue;
 
-  const orderedCategories = [];
-  STAGE_ORDER.forEach((cat) => {
-    if (grouped.has(cat)) {
-      orderedCategories.push(cat);
-    }
-  });
-  grouped.forEach((_, cat) => {
-    if (!orderedCategories.includes(cat)) {
-      orderedCategories.push(cat);
-    }
-  });
-
-  orderedCategories.forEach((cat) => {
-    const items = grouped.get(cat);
-    if (!items || items.length === 0) {
-      return;
-    }
     const details = document.createElement("details");
     details.className = "zone stage-zone";
     details.open = true;
 
     const summary = document.createElement("summary");
     const span = document.createElement("span");
-    // Translate stage name for display
-    const i18nKey = stageI18nMap[cat];
-    span.textContent = i18nKey ? t(i18nKey) : cat;
+    span.textContent = t("stage" + stageNum);
 
     const addBtn = document.createElement("button");
     addBtn.className = "stage-ctrl-btn";
@@ -957,7 +935,7 @@ function renderStages(stageItems) {
     addBtn.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopPropagation();
-      pendingStageId = "builtin:" + cat;
+      pendingStageId = "builtin:" + stageNum;
       addModal.classList.remove("hidden");
       metaNeedInput.focus();
     });
@@ -967,7 +945,7 @@ function renderStages(stageItems) {
 
     const section = document.createElement("section");
     section.className = "cards";
-    section.setAttribute("aria-label", cat + " 卡片列表");
+    section.setAttribute("aria-label", t("stage" + stageNum) + " 卡片列表");
     const fragment = document.createDocumentFragment();
     items.forEach((item, index) => {
       const card = createCard(item, "pool", index);
@@ -977,7 +955,7 @@ function renderStages(stageItems) {
     details.appendChild(section);
 
     stagesRoot.appendChild(details);
-  });
+  }
 }
 
 function renderCustomStages() {
@@ -1617,18 +1595,14 @@ function bindApiConfig() {
   });
 
   // Prompt Language toggle
-  async function updatePromptLang(newLang) {
+  function updatePromptLang(newLang) {
     currentPromptLang = newLang;
     localStorage.setItem("prompt-lang", currentPromptLang);
     document.querySelectorAll("#promptLangToggle1 .lang-toggle-btn").forEach((b) => {
       b.classList.toggle("active", b.dataset.lang === newLang);
     });
-    const markdown = await tryReadDataSource();
-    if (markdown) {
-      baseItems = parsePromptItems(markdown).map((item) => ({ ...item, source: "base" }));
-      refreshAllItems();
-      render();
-    }
+    refreshAllItems();
+    render();
   }
 
   document.querySelectorAll("#promptLangToggle .lang-toggle-btn, #promptLangToggle1 .lang-toggle-btn").forEach((btn) => {
@@ -1780,7 +1754,8 @@ function addNewCard(title, prompt) {
   let stageId = "";
 
   if (pendingStageId.startsWith("builtin:")) {
-    category = pendingStageId.slice(8);
+    const stageNum = pendingStageId.slice(8);
+    category = t("stage" + stageNum);
   } else if (pendingStageId) {
     const stage = state.customStages.find((s) => s.id === pendingStageId);
     category = stage ? stage.name : "未分类";
@@ -1886,54 +1861,31 @@ function commitState(options = {}) {
 }
 
 function refreshAllItems() {
-  allItems = materializeItems(baseItems, state);
-}
-
-function materializeItems(base, currentState) {
-  const deleted = new Set(currentState.deletedCardIds);
-  const edited = currentState.editedCards || {};
+  const deleted = new Set(state.deletedCardIds);
   const seen = new Set();
   const output = [];
 
-  base.forEach((item) => {
-    if (deleted.has(item.id)) {
-      return;
+  baseCardIds.forEach((id) => {
+    if (deleted.has(id)) return;
+    const card = getCardFromBank(id);
+    if (card && !seen.has(id)) {
+      seen.add(id);
+      output.push(card);
     }
-    const patch = edited[item.id];
-    const next = {
-      id: item.id,
-      title: patch && typeof patch.title === "string" ? patch.title : item.title,
-      category: item.category || "未分类",
-      prompt: patch && typeof patch.prompt === "string" ? patch.prompt : item.prompt,
-      hint: item.hint || "",
-      source: "base",
-    };
-    if (!next.title || !next.prompt || seen.has(next.id)) {
-      return;
-    }
-    seen.add(next.id);
-    output.push(next);
   });
 
-  currentState.customCards.forEach((item) => {
-    if (!item || !item.id || !item.title || !item.prompt) {
-      return;
-    }
-    if (seen.has(item.id)) {
-      return;
-    }
+  state.customCards.forEach((item) => {
+    if (!item || !item.id || !item.title || !item.prompt) return;
+    if (seen.has(item.id)) return;
     seen.add(item.id);
     output.push({
-      id: item.id,
-      title: item.title,
-      category: item.category || "未分类",
-      prompt: item.prompt,
+      ...item,
       hint: item.hint || "",
       source: "custom",
     });
   });
 
-  return output;
+  allItems = output;
 }
 
 function normalizeCommonIds(ids, items) {
